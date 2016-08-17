@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item name="app_bar_id" type="id"/>
+    <item name="header_id" type="id"/>
+
+</resources>
