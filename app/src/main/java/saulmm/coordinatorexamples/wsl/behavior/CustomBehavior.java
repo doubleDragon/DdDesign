@@ -20,23 +20,32 @@ import saulmm.coordinatorexamples.R;
 public class CustomBehavior extends HeaderScrollingViewBehavior implements AppBarLayout.OnOffsetChangedListener {
 
     private int actionBarHeight;
+    private int statusBarHeight;
     private int verticalOffset;
 
-    private int childHeight;
-    private int dependencyHeight;
+    private int measuredHeight;
 
-    public CustomBehavior() {
-    }
+    private int maxNestedOffset;
+    private int minNestedOffset;
+
+    private int deltaOffset;
 
     public CustomBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
+
 
         TypedValue tv = new TypedValue();
         if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
             actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,
                     context.getResources().getDisplayMetrics());
         }
+
+        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            statusBarHeight = context.getResources().getDimensionPixelSize(resourceId);
+        }
     }
+
 
     @Override
     View findFirstDependency(List<View> views) {
@@ -55,22 +64,26 @@ public class CustomBehavior extends HeaderScrollingViewBehavior implements AppBa
     }
 
     @Override
-    public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
-        initIfNeeded(child, dependency);
+    public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View
+            dependency) {
+        initParamsIfNeeded(child, dependency);
         updateOffset(parent, child, dependency);
         return false;
     }
 
-    private void initIfNeeded(View child, View dependency) {
-        if (childHeight == 0) {
-            childHeight = child.getMeasuredHeight();
-        }
-        if(dependencyHeight == 0) {
-            dependencyHeight = dependency.getMeasuredHeight();
+    private void initParamsIfNeeded(View child, View dependency) {
+        if (measuredHeight == 0) {
+            measuredHeight = child.getMeasuredHeight();
         }
         if (isDependsOn(dependency)) {
             AppBarLayout appBarLayout = (AppBarLayout) dependency;
             appBarLayout.addOnOffsetChangedListener(this);
+
+            if (minNestedOffset == 0 || maxNestedOffset == 0) {
+                int appbarHeight = appBarLayout.getMeasuredHeight();
+                maxNestedOffset = appbarHeight - appBarLayout.getTotalScrollRange();
+                minNestedOffset = maxNestedOffset - measuredHeight - statusBarHeight;
+            }
         }
     }
 
@@ -120,7 +133,7 @@ public class CustomBehavior extends HeaderScrollingViewBehavior implements AppBa
     private boolean updateOffset(CoordinatorLayout parent, View child, View dependency) {
         if (isDependsOn(dependency)) {
             // Offset the child so that it is below the app-bar (with any overlap)
-            final int offset = this.verticalOffset;
+            final int offset = this.verticalOffset + deltaOffset;
             setTopAndBottomOffset(dependency.getHeight() + offset);
             return true;
         }
@@ -142,16 +155,58 @@ public class CustomBehavior extends HeaderScrollingViewBehavior implements AppBa
     @Override
     public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, View child, View directTargetChild, View target, int nestedScrollAxes) {
         Log.d("test", "onStartNestedScroll---child: " + dumpView(child) + "---directTargetChild: " + dumpView(directTargetChild) + "---target: " + dumpView(target) + "---nestedScrollAxes: " + nestedScrollAxes);
+//        Log.d("nest", "getTopAndBottomOffset: " + getTopAndBottomOffset() + "---measuredHeight: " + measuredHeight);
         return (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
     }
 
     @Override
     public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, View child, View target, int dx, int dy, int[] consumed) {
 //        Log.d("test", "onStartNestedScroll---child: " + child + "---target: " + target + "---dy: " + dy + "---consumed: " + dumpArray(consumed));
-//        if(dy > 0) {
-//            setTopAndBottomOffset(dy);
-//            consumed[1] = dy;
-//        }
+        if (dy != 0) {
+            int min, max;
+            if (dy < 0) {
+                min = maxNestedOffset;
+                max = minNestedOffset;
+            } else {
+                min = minNestedOffset;
+                max = maxNestedOffset;
+            }
+            consumed[1] = scroll(coordinatorLayout, child, dy, min, max);
+        }
+    }
+
+    private int scroll(CoordinatorLayout coordinatorLayout, View header,
+                       int dy, int minOffset, int maxOffset) {
+        return setHeaderTopBottomOffset(coordinatorLayout, header,
+                getTopBottomOffsetForScrollingSibling() - dy, minOffset, maxOffset);
+    }
+
+    private int setHeaderTopBottomOffset(CoordinatorLayout coordinatorLayout,
+                                         View header, int newOffset, int minOffset, int maxOffset) {
+        final int curOffset = getTopBottomOffsetForScrollingSibling();
+        int consumed = 0;
+
+        if (minOffset != 0 && curOffset >= minOffset
+                && curOffset <= maxOffset) {
+            // If we have some scrolling range, and we're currently within the min and max
+            // offsets, calculate a new offset
+            newOffset = MathUtils.constrain(newOffset, minOffset, maxOffset);
+            Log.d("off", "---curOffset: " + curOffset + "---newOffset: " + newOffset + "---minOffset: " + minOffset + "---maxOffset: " + maxOffset);
+            if (curOffset != newOffset) {
+                boolean offsetChanged = setTopAndBottomOffset(newOffset);
+
+                // Update how much dy we have consumed
+                consumed = curOffset - newOffset;
+                // Update the stored sibling offset
+                deltaOffset = newOffset - maxOffset;
+            }
+        }
+
+        return consumed;
+    }
+
+    private int getTopBottomOffsetForScrollingSibling() {
+        return getTopAndBottomOffset();
     }
 
     private boolean hasScrollableChildren() {
@@ -159,7 +214,7 @@ public class CustomBehavior extends HeaderScrollingViewBehavior implements AppBa
     }
 
     private int getTotalScrollRange() {
-        return childHeight;
+        return measuredHeight;
     }
 
     private String dumpArray(int[] temp) {
@@ -175,7 +230,7 @@ public class CustomBehavior extends HeaderScrollingViewBehavior implements AppBa
 
     private String dumpView(View view) {
         StringBuilder sb = new StringBuilder();
-        sb.append(view.getClass());
+        sb.append(view.getClass().getSimpleName());
         sb.append("(");
         sb.append(view.getId());
         sb.append(")");

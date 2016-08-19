@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <!--<saulmm.coordinatorexamples.wsl.view.HeaderLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:orientation="vertical">-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/first"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="@string/about"-->
+    <!--/>-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/second"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="@string/lorem"-->
+    <!--/>-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/third"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="@string/swype.help"-->
+    <!--/>-->
+
+    <!--</saulmm.coordinatorexamples.wsl.view.HeaderLayout>-->
+
+    <saulmm.coordinatorexamples.wsl.view.SubHeaderLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/second"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/lorem" />
+
+        <TextView
+            android:id="@+id/third"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#f00"
+            android:text="@string/swype.help" />
+
+    </saulmm.coordinatorexamples.wsl.view.SubHeaderLayout>
+
+
+</RelativeLayout>

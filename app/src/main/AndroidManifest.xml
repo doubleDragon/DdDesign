@@ -11,7 +11,7 @@
 		>
 
 		<activity
-			android:name=".wsl.TestActivity"
+			android:name=".wsl.TestActivity3"
 			android:label="@string/app_name"
 			android:theme="@style/AppTheme.TestTheme"
 			>

@@ -4,4 +4,10 @@
     <item name="app_bar_id" type="id"/>
     <item name="header_id" type="id"/>
 
+    <item name="id_first" type="id"/>
+    <item name="id_second" type="id"/>
+    <item name="id_content" type="id"/>
+    <item name="id_tab" type="id"/>
+
+
 </resources>
