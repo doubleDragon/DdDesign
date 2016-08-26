@@ -1,19 +1,17 @@
-package saulmm.coordinatorexamples.wsl.behavior;
+package saulmm.coordinatorexamples.wsl.design;
 
 import android.content.Context;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
 
 import java.util.List;
 
 import saulmm.coordinatorexamples.R;
+import saulmm.coordinatorexamples.wsl.design.HeaderScrollingViewBehavior;
 
 /**
  * Created by wsl on 16-8-17.

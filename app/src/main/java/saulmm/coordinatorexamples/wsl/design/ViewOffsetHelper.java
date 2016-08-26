@@ -1,9 +1,12 @@
-package saulmm.coordinatorexamples.wsl.behavior;
+package saulmm.coordinatorexamples.wsl.design;
 
 import android.os.Build;
 import android.support.v4.view.ViewCompat;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewParent;
+
+import saulmm.coordinatorexamples.R;
 
 /**
  * Created by wsl on 16-8-17.

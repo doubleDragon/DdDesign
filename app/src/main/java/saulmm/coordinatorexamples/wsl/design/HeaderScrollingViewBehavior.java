@@ -1,4 +1,4 @@
-package saulmm.coordinatorexamples.wsl.behavior;
+package saulmm.coordinatorexamples.wsl.design;
 
 import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
@@ -15,9 +15,9 @@ import java.util.List;
 
 abstract class HeaderScrollingViewBehavior extends ViewOffsetBehavior<View> {
 
-    public HeaderScrollingViewBehavior() {}
+    HeaderScrollingViewBehavior() {}
 
-    public HeaderScrollingViewBehavior(Context context, AttributeSet attrs) {
+    HeaderScrollingViewBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 

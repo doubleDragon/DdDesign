@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <saulmm.coordinatorexamples.wsl.design.DdBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true">
+
+        <saulmm.coordinatorexamples.wsl.design.DdCollapsingBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:background="?attr/colorPrimary"
+                android:text="@string/example_title"
+                app:collapseMode="pin"/>
+
+            <include
+                layout="@layout/layout_banner_layout"
+                app:collapseMode="parallax" />
+
+
+        </saulmm.coordinatorexamples.wsl.design.DdCollapsingBarLayout>
+
+        <saulmm.coordinatorexamples.wsl.design.DdSecondLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:overlapTop="50dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#0ff"
+                android:text="@string/about"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:text="@string/example_title"
+                android:background="#ff0"
+                android:gravity="center"
+                />
+
+        </saulmm.coordinatorexamples.wsl.design.DdSecondLayout>
+
+    </saulmm.coordinatorexamples.wsl.design.DdBarLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior=".wsl.design.DdBarLayout$ScrollingViewBehavior"
+        />
+
+</android.support.design.widget.CoordinatorLayout>

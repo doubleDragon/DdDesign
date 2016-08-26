@@ -1,4 +1,4 @@
-package saulmm.coordinatorexamples.wsl.behavior;
+package saulmm.coordinatorexamples.wsl.design;
 
 import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
@@ -9,6 +9,7 @@ import android.view.View;
 import java.util.List;
 
 import saulmm.coordinatorexamples.R;
+import saulmm.coordinatorexamples.wsl.design.HeaderScrollingViewBehavior;
 
 /**
  * Created by wsl on 16-8-17.

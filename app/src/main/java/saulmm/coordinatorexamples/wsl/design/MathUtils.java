@@ -1,10 +1,10 @@
-package saulmm.coordinatorexamples.wsl.behavior;
+package saulmm.coordinatorexamples.wsl.design;
 
 /**
  * Created by wsl on 16-8-18.
  */
 
-public class MathUtils {
+class MathUtils {
 
     static int constrain(int amount, int low, int high) {
         return amount < low ? low : (amount > high ? high : amount);

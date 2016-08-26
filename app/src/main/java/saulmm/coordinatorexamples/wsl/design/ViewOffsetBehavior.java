@@ -1,9 +1,11 @@
-package saulmm.coordinatorexamples.wsl.behavior;
+package saulmm.coordinatorexamples.wsl.design;
 
 import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
 import android.util.AttributeSet;
 import android.view.View;
+
+import saulmm.coordinatorexamples.wsl.design.ViewOffsetHelper;
 
 /**
  * Created by wsl on 16-8-17.
