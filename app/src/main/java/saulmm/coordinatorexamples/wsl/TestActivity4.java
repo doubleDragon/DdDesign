@@ -10,7 +10,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -24,6 +26,9 @@ public class TestActivity4 extends AppCompatActivity {
 //    @BindView(R.id.tabLayout)
 //    TabLayout tabLayout;
 
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +39,14 @@ public class TestActivity4 extends AppCompatActivity {
     }
 
     private void initViews() {
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null) {
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
+
 //        tabLayout.addTab(tabLayout.newTab().setText("tag0"));
 //        tabLayout.addTab(tabLayout.newTab().setText("tag1"));
 //        tabLayout.addTab(tabLayout.newTab().setText("tag2"));

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.WindowInsetsCompat;
@@ -17,27 +18,29 @@ import saulmm.coordinatorexamples.R;
 import saulmm.coordinatorexamples.wsl.DdUtil;
 
 /**
+ * Just for test DdCollapsingBarLayout
  * Created by wsl on 16-8-25.
  */
 
 public class DdCollapsingBarLayout extends ViewGroup {
 
-    private static final int INVALIDE_PIN_HEIGHT = -1;
-
+    private static final int INVALID_HEIGHT_PX = -1;
     private static final int SCRIM_ANIMATION_DURATION = 600;
 
     private Drawable mContentScrim;
     private Drawable mStatusBarScrim;
     private int mScrimAlpha;
+    private int mScrimOffset;
     private boolean mScrimsAreShown;
     private ValueAnimatorCompat mScrimAnimator;
 
     private DdBarLayout.OnOffsetChangedListener mOnOffsetChangedListener;
 
     private int mCurrentOffset;
-    private int mPinHeight = INVALIDE_PIN_HEIGHT;
+    private int mOffHeight = INVALID_HEIGHT_PX;
 
     private WindowInsetsCompat mLastInsets;
+    private View mPinChild;
 
     public DdCollapsingBarLayout(Context context) {
         this(context, null);
@@ -58,7 +61,7 @@ public class DdCollapsingBarLayout extends ViewGroup {
 //        R.style.Widget_Design_CollapsingToolbar
         TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.DdCollapsingBarLayout, defStyleAttr,
-                0);
+                R.style.Widget_Design_DdCollapsingBar);
         setContentScrim(a.getDrawable(R.styleable.DdCollapsingBarLayout_dd_contentScrim));
         setStatusBarScrim(a.getDrawable(R.styleable.DdCollapsingBarLayout_dd_statusBarScrim));
 
@@ -75,6 +78,22 @@ public class DdCollapsingBarLayout extends ViewGroup {
                         return insets.consumeSystemWindowInsets();
                     }
                 });
+    }
+
+    private View getPinChild() {
+        if (mPinChild != null) {
+            return mPinChild;
+        }
+        View view = null;
+        for (int i = 0, count = getChildCount(); i < count; i++) {
+            View child = getChildAt(i);
+            LayoutParams lp = (LayoutParams) child.getLayoutParams();
+            if (lp.getCollapseMode() == LayoutParams.COLLAPSE_MODE_PIN) {
+                view = child;
+                break;
+            }
+        }
+        return mPinChild = view;
     }
 
     @Override
@@ -108,7 +127,6 @@ public class DdCollapsingBarLayout extends ViewGroup {
         int maxHeight = 0;
         int childState = 0;
 
-        int pinHeight = 0;
         //measure content
         int count = getChildCount();
         for (int i = 0; i < count; i++) {
@@ -122,17 +140,23 @@ public class DdCollapsingBarLayout extends ViewGroup {
             final LayoutParams lp = (LayoutParams) child.getLayoutParams();
 
             maxWidth = Math.max(maxWidth, childWidth + lp.leftMargin + lp.rightMargin);
-            maxHeight = Math.max(maxHeight, childHeight + lp.topMargin + lp.bottomMargin);
-            if(lp.getCollapseMode() == LayoutParams.COLLAPSE_MODE_PIN) {
-                pinHeight = childHeight + lp.topMargin + lp.bottomMargin;
+            switch (lp.getCollapseMode()) {
+
+                case LayoutParams.COLLAPSE_MODE_PIN:
+                case LayoutParams.COLLAPSE_MODE_PARALLAX:
+                    //view index 0 or 1
+                    maxHeight = Math.max(maxHeight, childHeight + lp.topMargin + lp.bottomMargin);
+                    break;
+                case LayoutParams.COLLAPSE_MODE_OFF:
+                    //view index 2
+                    maxHeight += childHeight + lp.topMargin + lp.bottomMargin;
+                    break;
             }
             childState = combineMeasuredStates(childState, child.getMeasuredState());
         }
 
         maxWidth = Math.max(maxWidth, getSuggestedMinimumWidth());
         maxHeight = Math.max(maxHeight, getSuggestedMinimumHeight());
-
-        maxHeight += pinHeight;
 
         setMeasuredDimension(resolveSizeAndState(maxWidth, widthMeasureSpec, childState),
                 resolveSizeAndState(maxHeight, heightMeasureSpec, childState << MEASURED_HEIGHT_STATE_SHIFT));
@@ -147,6 +171,7 @@ public class DdCollapsingBarLayout extends ViewGroup {
         final int parentBottom = b - t - getPaddingBottom();
 
         int count = getChildCount();
+        int parallaxBottom = 0;
         for (int i = 0; i < count; i++) {
             View child = getChildAt(i);
             if (child.getVisibility() == GONE) {
@@ -158,16 +183,43 @@ public class DdCollapsingBarLayout extends ViewGroup {
 
             int left = parentLeft + lp.leftMargin;
             int right = Math.min(left + childWidth, parentRight - lp.rightMargin);
-
-            int top = parentTop + lp.topMargin;
-            int bottom = Math.min(top + childHeight, parentBottom - lp.bottomMargin);
+            int top;
+            int bottom;
+            switch (lp.getCollapseMode()) {
+                case LayoutParams.COLLAPSE_MODE_PIN:
+                    top = parentTop + lp.topMargin;
+                    bottom = Math.min(top + childHeight, parentBottom - lp.bottomMargin);
+                    setMinimumHeight(childHeight + lp.topMargin + lp.bottomMargin);
+                    break;
+                case LayoutParams.COLLAPSE_MODE_PARALLAX:
+                    top = parentTop + lp.topMargin;
+                    bottom = Math.min(top + childHeight, parentBottom - lp.bottomMargin);
+                    parallaxBottom = bottom;
+                    break;
+                case LayoutParams.COLLAPSE_MODE_OFF:
+                default:
+                    top = parallaxBottom + lp.topMargin;
+                    bottom = top + childHeight;
+                    break;
+            }
 
             child.layout(left, top, right, bottom);
+        }
 
-            if(i == 0) {
-                //set bar height value to min height
-                setMinimumHeight(childHeight + lp.topMargin + lp.bottomMargin);
+        // Update our child view offset helpers
+        for (int i = 0, z = getChildCount(); i < z; i++) {
+            final View child = getChildAt(i);
+
+            if (mLastInsets != null && !ViewCompat.getFitsSystemWindows(child)) {
+                final int insetTop = mLastInsets.getSystemWindowInsetTop();
+                if (child.getTop() < insetTop) {
+                    // If the child isn't set to fit system windows but is drawing within the inset
+                    // offset it down
+                    child.offsetTopAndBottom(insetTop);
+                }
             }
+
+            getViewOffsetHelper(child).onViewLayout();
         }
     }
 
@@ -180,13 +232,47 @@ public class DdCollapsingBarLayout extends ViewGroup {
         return offsetHelper;
     }
 
+    private int getOffHeight() {
+        if (isInEditMode()) {
+            return INVALID_HEIGHT_PX;
+        }
+        if (mOffHeight != INVALID_HEIGHT_PX) {
+            return mOffHeight;
+        }
+        int offHeight = INVALID_HEIGHT_PX;
+        int count = getChildCount();
+        for (int i = count - 1; i > 0; i--) {
+            View child = getChildAt(i);
+            LayoutParams lp = (LayoutParams) child.getLayoutParams();
+            if (lp.getCollapseMode() == LayoutParams.COLLAPSE_MODE_OFF) {
+                offHeight = child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin;
+                break;
+            }
+        }
+        return mOffHeight = offHeight;
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+//        if (mContentScrim != null) {
+//            mContentScrim.setBounds(0, 0, w, h - getOffHeight());
+//        }
+    }
+
+    @Override
+    protected void dispatchDraw(Canvas canvas) {
+        super.dispatchDraw(canvas);
+    }
+
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
 
         // If we don't have a toolbar, the scrim will be not be drawn in drawChild() below.
         // Instead, we draw it here, before our collapsing text.
-        if (mContentScrim != null && mScrimAlpha > 0) {
+        if (getPinChild() == null && mContentScrim != null && mScrimAlpha > 0) {
+            mContentScrim.setBounds(0, mScrimOffset, getWidth(), getHeight() - getOffHeight() + mScrimOffset);
             mContentScrim.mutate().setAlpha(mScrimAlpha);
             mContentScrim.draw(canvas);
         }
@@ -206,6 +292,22 @@ public class DdCollapsingBarLayout extends ViewGroup {
                 mStatusBarScrim.draw(canvas);
             }
         }
+    }
+
+    @Override
+    protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
+        // This is a little weird. Our scrim needs to be behind the Toolbar (if it is present),
+        // but in front of any other children which are behind it. To do this we intercept the
+        // drawChild() call, and draw our scrim first when drawing the toolbar
+        View pinView = getPinChild();
+        if (pinView != null && child == pinView && mContentScrim != null && mScrimAlpha > 0) {
+            mContentScrim.setBounds(0, mScrimOffset, getWidth(), getHeight() - getOffHeight() + mScrimOffset);
+            mContentScrim.mutate().setAlpha(mScrimAlpha);
+            mContentScrim.draw(canvas);
+        }
+
+        // Carry on drawing the child...
+        return super.drawChild(canvas, child, drawingTime);
     }
 
     public void setStatusBarScrim(@Nullable Drawable drawable) {
@@ -228,7 +330,7 @@ public class DdCollapsingBarLayout extends ViewGroup {
             }
             if (drawable != null) {
                 mContentScrim = drawable.mutate();
-                drawable.setBounds(0, 0, getWidth(), getHeight() - getPinHeight());
+                drawable.setBounds(0, 0, getWidth(), getHeight() - getOffHeight());
                 drawable.setCallback(this);
                 drawable.setAlpha(mScrimAlpha);
             } else {
@@ -236,23 +338,6 @@ public class DdCollapsingBarLayout extends ViewGroup {
             }
             ViewCompat.postInvalidateOnAnimation(this);
         }
-    }
-
-    private int getPinHeight() {
-        if(mPinHeight != INVALIDE_PIN_HEIGHT) {
-            return mPinHeight;
-        }
-        int pinHeight = 0;
-        int count = getChildCount();
-        for(int i=0; i<count; i++) {
-            View child = getChildAt(i);
-            LayoutParams lp = (LayoutParams) child.getLayoutParams();
-            if(lp.getCollapseMode() == LayoutParams.COLLAPSE_MODE_PIN) {
-                pinHeight = child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin;
-                break;
-            }
-        }
-        return mPinHeight = pinHeight;
     }
 
     /**
@@ -299,8 +384,9 @@ public class DdCollapsingBarLayout extends ViewGroup {
     private void setScrimAlpha(int alpha) {
         if (alpha != mScrimAlpha) {
 //            final Drawable contentScrim = mContentScrim;
-//            if (contentScrim != null && mToolbar != null) {
-//                ViewCompat.postInvalidateOnAnimation(mToolbar);
+//            View pinChild = getPinChild();
+//            if (contentScrim != null && pinChild != null) {
+//                ViewCompat.postInvalidateOnAnimation(pinChild);
 //            }
             mScrimAlpha = alpha;
             ViewCompat.postInvalidateOnAnimation(DdCollapsingBarLayout.this);
@@ -329,7 +415,7 @@ public class DdCollapsingBarLayout extends ViewGroup {
 
     public static class LayoutParams extends MarginLayoutParams {
 
-        private static final float DEFAULT_PARALLAX_MULTIPLIER = 0.5f;
+        private static final float DEFAULT_PARALLAX_MULTIPLIER = 0.7f;
 
         public static final int COLLAPSE_MODE_OFF = 0;
 
@@ -343,7 +429,7 @@ public class DdCollapsingBarLayout extends ViewGroup {
         public LayoutParams(Context context, AttributeSet attrs) {
             super(context, attrs);
             TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.DdCollapsingBarLayout_LayoutParams);
-            collapseMode = a.getInt(R.styleable.DdCollapsingBarLayout_LayoutParams_collapseMode, 0);
+            collapseMode = a.getInt(R.styleable.DdCollapsingBarLayout_LayoutParams_collapseMode, COLLAPSE_MODE_OFF);
             a.recycle();
         }
 
@@ -370,33 +456,48 @@ public class DdCollapsingBarLayout extends ViewGroup {
             mCurrentOffset = verticalOffset;
 
             final int insetTop = mLastInsets != null ? mLastInsets.getSystemWindowInsetTop() : 0;
-            final int scrollRange = layout.getTotalScrollRange();
-//            Log.d("test", "onOffsetChanged parent: " + DdUtil.dumpView(DdCollapsingBarLayout.this));
+            int offHeight = getOffHeight();
             for (int i = 0, z = getChildCount(); i < z; i++) {
                 final View child = getChildAt(i);
-                final DdCollapsingBarLayout.LayoutParams lp = (DdCollapsingBarLayout.LayoutParams) child.getLayoutParams();
+                final LayoutParams lp = (LayoutParams) child.getLayoutParams();
                 final ViewOffsetHelper offsetHelper = getViewOffsetHelper(child);
 
                 switch (lp.collapseMode) {
-                    case CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PIN:
-                        Log.d("test", "onOffsetChanged pin child: " + DdUtil.dumpView(child));
-                        if (getHeight() - getPinHeight() - insetTop + verticalOffset >= child.getHeight()) {
-                            offsetHelper.setTopAndBottomOffset(-verticalOffset);
-                        }
+                    case LayoutParams.COLLAPSE_MODE_PIN:
+//                        if (getHeight() - offHeight - insetTop + verticalOffset >= getMinimumHeight()) {
+//                            child.setAlpha(0f);
+//                        } else {
+//                            child.setAlpha(1f);
+//                        }
+                        //update alpha in draw method by param mScrimAlpha
+                        offsetHelper.setTopAndBottomOffset(-verticalOffset);
                         break;
-                    case CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PARALLAX:
-                        Log.d("test", "onOffsetChanged parallax child: " + DdUtil.dumpView(child));
+                    case LayoutParams.COLLAPSE_MODE_PARALLAX:
                         offsetHelper.setTopAndBottomOffset(
                                 Math.round(-verticalOffset * lp.mParallaxMult));
                         break;
+//                    case LayoutParams.COLLAPSE_MODE_OFF:
+//                        if (getHeight() - offHeight - insetTop + verticalOffset < getMinimumHeight()) {
+//                            offsetHelper.setTopAndBottomOffset(verticalOffset);
+//                        }
+//                        break;
                 }
             }
 
             // Show or hide the scrims if needed
             if (mContentScrim != null || mStatusBarScrim != null) {
-                Log.d("scrim", "height: " + getHeight() + "---verticalOffset: " + verticalOffset +
-                        "---scrimTriggerOffset: " + getScrimTriggerOffset() + "---insetTop: " + insetTop);
-                setScrimsShown(getHeight() - getPinHeight() + verticalOffset < getScrimTriggerOffset() + insetTop);
+                int scrimTriggerOffset = getScrimTriggerOffset();
+                //parallax View完全被隐藏起来的临界点
+                int delta = getHeight() - offHeight - insetTop - scrimTriggerOffset / 2;
+                if(-verticalOffset > delta) {
+                    mScrimOffset = -verticalOffset - delta;
+                } else {
+                    mScrimOffset = 0;
+                }
+                setScrimsShown(getHeight() - offHeight + verticalOffset < scrimTriggerOffset + insetTop);
+                if(mScrimOffset > 0 && android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                    ViewCompat.postInvalidateOnAnimation(DdCollapsingBarLayout.this);
+                }
             }
 
             if (mStatusBarScrim != null && insetTop > 0) {

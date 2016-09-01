@@ -906,7 +906,6 @@ public class CollapsingToolbarLayout extends FrameLayout {
 
             final int insetTop = mLastInsets != null ? mLastInsets.getSystemWindowInsetTop() : 0;
             final int scrollRange = layout.getTotalScrollRange();
-            Log.d("test", "onOffsetChanged parent: " + DdUtil.dumpView(CollapsingToolbarLayout.this));
             for (int i = 0, z = getChildCount(); i < z; i++) {
                 final View child = getChildAt(i);
                 final CollapsingToolbarLayout.LayoutParams lp = (CollapsingToolbarLayout.LayoutParams) child.getLayoutParams();
@@ -914,13 +913,11 @@ public class CollapsingToolbarLayout extends FrameLayout {
 
                 switch (lp.mCollapseMode) {
                     case CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PIN:
-                        Log.d("test", "onOffsetChanged pin child: " + DdUtil.dumpView(child));
                         if (getHeight() - insetTop + verticalOffset >= child.getHeight()) {
                             offsetHelper.setTopAndBottomOffset(-verticalOffset);
                         }
                         break;
                     case CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PARALLAX:
-                        Log.d("test", "onOffsetChanged parallax child: " + DdUtil.dumpView(child));
                         offsetHelper.setTopAndBottomOffset(
                                 Math.round(-verticalOffset * lp.mParallaxMult));
                         break;
@@ -929,8 +926,6 @@ public class CollapsingToolbarLayout extends FrameLayout {
 
             // Show or hide the scrims if needed
             if (mContentScrim != null || mStatusBarScrim != null) {
-                Log.d("scrim", "height: " + getHeight() + "---verticalOffset: " + verticalOffset +
-                        "---scrimTriggerOffset: " + getScrimTriggerOffset() + "---insetTop: " + insetTop);
                 setScrimsShown(getHeight() + verticalOffset < getScrimTriggerOffset() + insetTop);
             }
 

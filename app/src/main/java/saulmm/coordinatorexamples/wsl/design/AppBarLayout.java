@@ -871,7 +871,6 @@ public class AppBarLayout extends LinearLayout{
                     final int interpolatedOffset = appBarLayout.hasChildWithInterpolator()
                             ? interpolateOffset(appBarLayout, newOffset)
                             : newOffset;
-                    Log.d("test", "onOffsetChanged AppBar: " + DdUtil.dumpView(header));
                     boolean offsetChanged = setTopAndBottomOffset(interpolatedOffset);
 
                     // Update how much dy we have consumed

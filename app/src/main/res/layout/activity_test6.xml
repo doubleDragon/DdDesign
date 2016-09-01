@@ -24,13 +24,9 @@
                 android:background="#0ff"
                 android:text="@string/about" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="?attr/colorPrimary"
-                android:gravity="center"
-                android:text="@string/example_title"
-                app:collapseMode="pin" />
+
+            <include layout="@layout/layout_dd_toolbar"
+                />
 
         </saulmm.coordinatorexamples.wsl.design.DdCollapsingBarLayout>
 

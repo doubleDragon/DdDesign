@@ -10,13 +10,9 @@
 	</style>
 
 	<style name="AppTheme.SimpleCoordinatorTheme">
-		<!--<item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
-		<!--<item name="android:statusBarColor">@android:color/transparent</item>-->
 	</style>
 
 	<style name="AppTheme.TestTheme">
-		<!--<item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
-		<!--<item name="android:statusBarColor">@android:color/transparent</item>-->
 	</style>
 
 	<style name="ToolBarWithNavigationBack">
@@ -59,6 +55,8 @@
 	</style>
 
 
-
+	<style name="Widget.Design.DdCollapsingBar" parent="android:Widget">
+		<item name="dd_statusBarScrim">?attr/colorPrimary</item>
+	</style>
 
 </resources>

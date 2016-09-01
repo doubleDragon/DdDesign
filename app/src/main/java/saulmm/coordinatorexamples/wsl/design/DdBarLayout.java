@@ -10,6 +10,7 @@ import android.support.v4.os.ParcelableCompatCreatorCallbacks;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.WindowInsetsCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -328,7 +329,7 @@ public class DdBarLayout extends ViewGroup {
                                        View target) {
             if (!mWasFlung) {
                 // If we haven't been flung then let's see if the current view has been set to snap
-                snapToChildIfNeeded(coordinatorLayout, abl);
+//                snapToChildIfNeeded(coordinatorLayout, abl);
             }
 
             // Reset the flags
@@ -377,13 +378,24 @@ public class DdBarLayout extends ViewGroup {
         }
 
         @Override
+        int getMaxDragOffset(DdBarLayout view) {
+            return -view.getTotalScrollRange();
+        }
+
+        @Override
+        int getScrollRangeForDragFling(DdBarLayout view) {
+            return view.getTotalScrollRange();
+        }
+
+        @Override
         boolean canDragView(DdBarLayout view) {
             // Else we'll use the default behaviour of seeing if it can scroll down
             if (mLastNestedScrollingChildRef != null) {
                 // If we have a reference to a scrolling view, check it
                 final View scrollingView = mLastNestedScrollingChildRef.get();
-                return scrollingView != null && scrollingView.isShown()
-                        && !ViewCompat.canScrollVertically(scrollingView, -1);
+//                return scrollingView != null && scrollingView.isShown()
+//                        && !ViewCompat.canScrollVertically(scrollingView, -1);
+                return scrollingView != null && scrollingView.isShown();
             } else {
                 // Otherwise we assume that the scrolling view hasn't been scrolled and can drag.
                 return true;

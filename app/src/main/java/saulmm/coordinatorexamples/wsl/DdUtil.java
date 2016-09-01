@@ -1,5 +1,6 @@
 package saulmm.coordinatorexamples.wsl;
 
+import android.view.MotionEvent;
 import android.view.View;
 
 /**
@@ -14,6 +15,13 @@ public class DdUtil {
         sb.append("[");
         sb.append(view.getLeft()).append(",").append(view.getTop()).append(",").append(view.getRight()).append(",").append(view.getBottom());
         sb.append("]");
+        return sb.toString();
+    }
+
+    public static String dumpEvent(MotionEvent event) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(event.getAction());
+        sb.append("[").append(event.getX()).append(",").append(event.getY()).append("]");
         return sb.toString();
     }
 }
