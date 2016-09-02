@@ -1,4 +1,4 @@
-package saulmm.coordinatorexamples.wsl.design;
+package com.wsl.library.design;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -8,8 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.LinearLayout;
-
-import saulmm.coordinatorexamples.R;
 
 /**
  * Created by wsl on 16-8-30.

@@ -1,4 +1,4 @@
-package saulmm.coordinatorexamples.wsl.design;
+package com.wsl.library.design;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -9,15 +9,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.WindowInsetsCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import saulmm.coordinatorexamples.R;
 
 /**
  * Just for test DdCollapsingBarLayout
@@ -527,7 +524,7 @@ public class DdCollapsingBarLayout extends ViewGroup {
                     mContentScrimOffset = 0;
                 }
                 //4.4版本下drawChild不调用,这个地方判断版本并强制触发
-                if(mContentScrimOffset > 0 && android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                if(mContentScrimOffset > 0 && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                     ViewCompat.postInvalidateOnAnimation(DdCollapsingBarLayout.this);
                 }
 

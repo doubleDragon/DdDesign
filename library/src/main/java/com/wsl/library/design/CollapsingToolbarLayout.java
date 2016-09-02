@@ -1,4 +1,4 @@
-package saulmm.coordinatorexamples.wsl.design;
+package com.wsl.library.design;
 
 import android.content.Context;
 import android.content.res.TypedArray;

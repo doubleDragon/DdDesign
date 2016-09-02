@@ -1,4 +1,4 @@
-package saulmm.coordinatorexamples.wsl;
+package com.wsl.library.design;
 
 import android.view.MotionEvent;
 import android.view.View;

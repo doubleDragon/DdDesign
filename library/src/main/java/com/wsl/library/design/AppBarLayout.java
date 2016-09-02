@@ -1,4 +1,4 @@
-package saulmm.coordinatorexamples.wsl.design;
+package com.wsl.library.design;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -65,7 +65,7 @@ public class AppBarLayout extends LinearLayout{
 
     private WindowInsetsCompat mLastInsets;
 
-    private final List<AppBarLayout.OnOffsetChangedListener> mListeners;
+    private final List<OnOffsetChangedListener> mListeners;
 
     public AppBarLayout(Context context) {
         this(context, null);
@@ -221,8 +221,8 @@ public class AppBarLayout extends LinearLayout{
     protected AppBarLayout.LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
         if (p instanceof LinearLayout.LayoutParams) {
             return new AppBarLayout.LayoutParams((LinearLayout.LayoutParams) p);
-        } else if (p instanceof ViewGroup.MarginLayoutParams) {
-            return new AppBarLayout.LayoutParams((ViewGroup.MarginLayoutParams) p);
+        } else if (p instanceof MarginLayoutParams) {
+            return new AppBarLayout.LayoutParams((MarginLayoutParams) p);
         }
         return new AppBarLayout.LayoutParams(p);
     }
@@ -508,7 +508,7 @@ public class AppBarLayout extends LinearLayout{
             super(p);
         }
 
-        public LayoutParams(ViewGroup.MarginLayoutParams source) {
+        public LayoutParams(MarginLayoutParams source) {
             super(source);
         }
 
@@ -892,7 +892,7 @@ public class AppBarLayout extends LinearLayout{
         }
 
         private void dispatchOffsetUpdates(AppBarLayout layout) {
-            final List<AppBarLayout.OnOffsetChangedListener> listeners = layout.mListeners;
+            final List<OnOffsetChangedListener> listeners = layout.mListeners;
 
             // Iterate backwards through the list so that most recently added listeners
             // get the first chance to decide
@@ -995,7 +995,7 @@ public class AppBarLayout extends LinearLayout{
             }
         }
 
-        protected static class SavedState extends View.BaseSavedState {
+        protected static class SavedState extends BaseSavedState {
             int firstVisibleChildIndex;
             float firstVisibileChildPercentageShown;
             boolean firstVisibileChildAtMinimumHeight;
@@ -1019,7 +1019,7 @@ public class AppBarLayout extends LinearLayout{
                 dest.writeByte((byte) (firstVisibileChildAtMinimumHeight ? 1 : 0));
             }
 
-            public static final Parcelable.Creator<AppBarLayout.Behavior.SavedState> CREATOR =
+            public static final Creator<SavedState> CREATOR =
                     ParcelableCompat.newCreator(new ParcelableCompatCreatorCallbacks<SavedState>() {
                         @Override
                         public AppBarLayout.Behavior.SavedState createFromParcel(Parcel source, ClassLoader loader) {
