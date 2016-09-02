@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <com.wsl.library.design.DdBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true">
+
+        <com.wsl.library.design.DdCollapsingBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true"
+            app:dd_contentScrim="?attr/colorPrimary">
+
+            <include layout="@layout/layout_banner_layout" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#0ff"
+                android:text="@string/about" />
+
+
+            <include layout="@layout/layout_dd_toolbar"
+                />
+
+        </com.wsl.library.design.DdCollapsingBarLayout>
+
+        <com.wsl.library.design.DdSecondLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="#ff0"
+                android:gravity="center"
+                android:text="@string/example_title" />
+
+        </com.wsl.library.design.DdSecondLayout>
+
+    </com.wsl.library.design.DdBarLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="com.wsl.library.design.DdBarLayout$ScrollingViewBehavior" />
+
+</android.support.design.widget.CoordinatorLayout>

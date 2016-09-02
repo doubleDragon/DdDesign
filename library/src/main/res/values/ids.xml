@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item name="app_bar_id" type="id"/>
+    <item name="header_id" type="id"/>
+
+    <item name="id_first" type="id"/>
+    <item name="id_second" type="id"/>
+    <item name="id_content" type="id"/>
+    <item name="id_tab" type="id"/>
+    <item name="id_view_offset" type="id"/>
+
+
+</resources>

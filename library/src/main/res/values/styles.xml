@@ -1,0 +1,7 @@
+<resources>
+
+	<style name="Widget.Design.DdCollapsingBar" parent="android:Widget">
+		<item name="dd_statusBarScrim">?attr/colorPrimary</item>
+	</style>
+
+</resources>
