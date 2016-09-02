@@ -1,4 +1,4 @@
-package saulmm.coordinatorexamples.wsl;
+package saulmm.coordinatorexamples.test;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;

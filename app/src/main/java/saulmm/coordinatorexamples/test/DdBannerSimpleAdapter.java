@@ -1,4 +1,4 @@
-package saulmm.coordinatorexamples.wsl.banner;
+package saulmm.coordinatorexamples.test;
 
 import android.content.Context;
 import android.util.Log;

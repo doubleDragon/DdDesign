@@ -54,9 +54,4 @@
 		<item name="android:textColor">#5f5f5f</item>
 	</style>
 
-
-	<style name="Widget.Design.DdCollapsingBar" parent="android:Widget">
-		<item name="dd_statusBarScrim">?attr/colorPrimary</item>
-	</style>
-
 </resources>

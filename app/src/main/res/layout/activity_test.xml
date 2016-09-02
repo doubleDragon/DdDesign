@@ -3,118 +3,52 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/background_light"
     android:fitsSystemWindows="true">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/app_bar_id"
+    <com.wsl.library.design.DdBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:fitsSystemWindows="true">
 
-        <!--app:layout_scrollFlags="scroll|exitUntilCollapsed"-->
-
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/collapsing"
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:fitsSystemWindows="true"
-            app:contentScrim="?attr/colorPrimary"
-            app:expandedTitleMarginEnd="64dp"
-            app:expandedTitleMarginStart="48dp"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
-
-            <ImageView
-                android:id="@+id/backdrop"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:fitsSystemWindows="true"
-                android:scaleType="centerCrop"
-                android:src="@drawable/material_flat"
-                app:layout_collapseMode="parallax" />
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-        </android.support.design.widget.CollapsingToolbarLayout>
-
-        <!--<TextView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:background="#f00"-->
-        <!--android:text="@string/about"-->
-        <!--app:layout_scrollFlags="scroll" />-->
-
-        <!--<TextView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="48dp"-->
-        <!--android:background="#f0f"-->
-        <!--android:text="@string/about"-->
-        <!--app:layout_scrollFlags="scroll" />-->
-
-    </android.support.design.widget.AppBarLayout>
-
-    <!--<android.support.v4.widget.NestedScrollView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior">-->
-
-    <!--<LinearLayout-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:orientation="vertical">-->
-
-    <!--<TextView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:padding="@dimen/activity_horizontal_margin"-->
-    <!--android:text="@string/about"-->
-    <!--/>-->
-
-    <!--<TextView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:padding="@dimen/activity_horizontal_margin"-->
-    <!--android:text="@string/about"-->
-    <!--/>-->
-
-    <!--</LinearLayout>-->
-
-
-    <!--</android.support.v4.widget.NestedScrollView>-->
-
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/header_id"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_behavior=".wsl.behavior.CustomBehavior">
-
-        <TextView
+        <com.wsl.library.design.DdCollapsingBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/activity_horizontal_margin"
-            android:text="@string/lorem" />
+            android:fitsSystemWindows="true"
+            app:dd_contentScrim="?attr/colorPrimary">
 
-    </android.support.v4.widget.NestedScrollView>
+            <include layout="@layout/layout_banner_layout" />
 
-    <android.support.v4.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        app:layout_behavior=".wsl.behavior.CustomBehavior3">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#0ff"
+                android:text="@string/about" />
 
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tabLayout"
+
+            <include layout="@layout/layout_dd_toolbar"
+                />
+
+        </com.wsl.library.design.DdCollapsingBarLayout>
+
+        <com.wsl.library.design.DdSecondLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#333"
-            />
+            android:layout_height="wrap_content">
 
-    </android.support.v4.widget.NestedScrollView>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="#ff0"
+                android:gravity="center"
+                android:text="@string/example_title" />
 
+        </com.wsl.library.design.DdSecondLayout>
 
+    </com.wsl.library.design.DdBarLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="com.wsl.library.design.DdBarLayout$ScrollingViewBehavior" />
 
 </android.support.design.widget.CoordinatorLayout>

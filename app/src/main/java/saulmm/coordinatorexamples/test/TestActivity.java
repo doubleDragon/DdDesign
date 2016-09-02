@@ -1,4 +1,4 @@
-package saulmm.coordinatorexamples.wsl;
+package saulmm.coordinatorexamples.test;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 
 import com.wsl.library.banner.DdBannerIndicator;
 
@@ -17,13 +16,12 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import saulmm.coordinatorexamples.R;
-import saulmm.coordinatorexamples.wsl.banner.DdBannerSimpleAdapter;
 
 /**
  * Created by wsl on 16-8-25.
  */
 
-public class TestActivity5 extends AppCompatActivity{
+public class TestActivity extends AppCompatActivity{
 
     @BindView(R.id.dd_banner_viewpager)
     ViewPager bannerPager;
@@ -36,7 +34,7 @@ public class TestActivity5 extends AppCompatActivity{
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test5);
+        setContentView(R.layout.activity_test);
         ButterKnife.bind(this);
 
         initViews();
