@@ -21,10 +21,10 @@ public class TestAdapter extends RecyclerView.Adapter{
 
     private List<String> data;
 
-    public TestAdapter() {
+    public TestAdapter(int count) {
         super();
         data = new ArrayList<>();
-        for(int i=0; i< 20; i++) {
+        for(int i=0; i< count; i++) {
             data.add("item " + i);
         }
     }

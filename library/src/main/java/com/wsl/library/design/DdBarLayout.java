@@ -87,6 +87,10 @@ public class DdBarLayout extends ViewGroup {
         }
     }
 
+    private void invalidateScrollRanges() {
+        mTotalScrollRange = INVALID_SCROLL_RANGE;
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int maxWidth = 0;
@@ -111,8 +115,10 @@ public class DdBarLayout extends ViewGroup {
         maxWidth = Math.max(maxWidth, getSuggestedMinimumWidth());
         maxHeight = Math.max(maxHeight, getSuggestedMinimumHeight());
 
+//      resolveSizeAndState(maxHeight, heightMeasureSpec, childState << MEASURED_HEIGHT_STATE_SHIFT) return wrong height
         setMeasuredDimension(resolveSizeAndState(maxWidth, widthMeasureSpec, childState),
-                resolveSizeAndState(maxHeight, heightMeasureSpec, childState << MEASURED_HEIGHT_STATE_SHIFT));
+                maxHeight);
+        invalidateScrollRanges();
     }
 
     @Override

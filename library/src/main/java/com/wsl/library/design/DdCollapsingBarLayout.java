@@ -101,6 +101,10 @@ public class DdCollapsingBarLayout extends ViewGroup {
         return mPinChild = view;
     }
 
+    private void invalidOffset() {
+        mOffHeight = INVALID_HEIGHT_PX;
+    }
+
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -151,6 +155,7 @@ public class DdCollapsingBarLayout extends ViewGroup {
                 case LayoutParams.COLLAPSE_MODE_PARALLAX:
                     //view index 0 or 1
                     maxHeight = Math.max(maxHeight, childHeight + lp.topMargin + lp.bottomMargin);
+
                     break;
                 case LayoutParams.COLLAPSE_MODE_OFF:
                     //view index 2
@@ -163,8 +168,10 @@ public class DdCollapsingBarLayout extends ViewGroup {
         maxWidth = Math.max(maxWidth, getSuggestedMinimumWidth());
         maxHeight = Math.max(maxHeight, getSuggestedMinimumHeight());
 
+//      resolveSizeAndState(maxHeight, heightMeasureSpec, childState << MEASURED_HEIGHT_STATE_SHIFT) return wrong height
         setMeasuredDimension(resolveSizeAndState(maxWidth, widthMeasureSpec, childState),
-                resolveSizeAndState(maxHeight, heightMeasureSpec, childState << MEASURED_HEIGHT_STATE_SHIFT));
+                maxHeight);
+        invalidOffset();
     }
 
     @Override
@@ -265,10 +272,6 @@ public class DdCollapsingBarLayout extends ViewGroup {
 //        }
     }
 
-    @Override
-    protected void dispatchDraw(Canvas canvas) {
-        super.dispatchDraw(canvas);
-    }
 
     @Override
     public void draw(Canvas canvas) {
@@ -399,7 +402,7 @@ public class DdCollapsingBarLayout extends ViewGroup {
     }
 
     private void dispatchOffsetToChild(int start, int end, int verticalOffset) {
-        for(OffsetListener listener : mListeners) {
+        for (OffsetListener listener : mListeners) {
             listener.onOffset(start, end, verticalOffset);
         }
     }
@@ -518,13 +521,13 @@ public class DdCollapsingBarLayout extends ViewGroup {
 
                 //parallax View完全被隐藏起来的临界点,超过临界点后DdBarLayout向上偏移的同时ContentScrim向下偏移
                 int contentScrimDelta = delta - scrimTriggerOffset / 2;
-                if(-verticalOffset > contentScrimDelta) {
+                if (-verticalOffset > contentScrimDelta) {
                     mContentScrimOffset = -verticalOffset - contentScrimDelta;
                 } else {
                     mContentScrimOffset = 0;
                 }
                 //4.4版本下drawChild不调用,这个地方判断版本并强制触发
-                if(mContentScrimOffset > 0 && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                if (mContentScrimOffset > 0 && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                     ViewCompat.postInvalidateOnAnimation(DdCollapsingBarLayout.this);
                 }
 

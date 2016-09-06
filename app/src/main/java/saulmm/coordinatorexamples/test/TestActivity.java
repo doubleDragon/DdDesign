@@ -28,8 +28,11 @@ public class TestActivity extends AppCompatActivity{
     @BindView(R.id.dd_banner_indicator)
     DdBannerIndicator bannerIndicator;
 
-    @BindView(R.id.recycler_view)
-    RecyclerView recyclerView;
+    @BindView(R.id.rv_header)
+    RecyclerView rvHeader;
+
+    @BindView(R.id.rv_content)
+    RecyclerView rvContent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,9 +54,14 @@ public class TestActivity extends AppCompatActivity{
         bannerPager.setAdapter(adapter);
         bannerIndicator.setupViewpager(bannerPager);
 
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(new TestAdapter());
+        rvHeader.setHasFixedSize(true);
+        rvHeader.setLayoutManager(new LinearLayoutManager(this));
+        rvHeader.setItemAnimator(new DefaultItemAnimator());
+        rvHeader.setAdapter(new TestAdapter(10));
+
+        rvContent.setHasFixedSize(true);
+        rvContent.setLayoutManager(new LinearLayoutManager(this));
+        rvContent.setItemAnimator(new DefaultItemAnimator());
+        rvContent.setAdapter(new TestAdapter(20));
     }
 }

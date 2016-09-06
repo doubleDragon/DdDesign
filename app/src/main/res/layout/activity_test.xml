@@ -18,11 +18,13 @@
 
             <include layout="@layout/layout_banner_layout" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#0ff"
-                android:text="@string/about" />
+            <include layout="@layout/layout_header_layout" />
+
+            <!--<TextView-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:background="#0ff"-->
+                <!--android:text="@string/about" />-->
 
 
             <include layout="@layout/layout_dd_toolbar"
@@ -46,7 +48,7 @@
     </com.wsl.library.design.DdBarLayout>
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view"
+        android:id="@+id/rv_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_behavior="com.wsl.library.design.DdBarLayout$ScrollingViewBehavior" />
