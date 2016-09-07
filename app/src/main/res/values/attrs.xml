@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <declare-styleable name="FrameLayout">
+
+        <attr name="dd_foregroundGravity" format="integer" />
+        <attr name="dd_foreground" format="reference" />
+        <attr name="dd_foregroundInsidePadding" format="boolean" />
+        <attr name="dd_measureAllChildren" format="boolean" />
+
+    </declare-styleable>
+
+    <declare-styleable name="FrameLayout_Layout">
+
+        <attr name="dd_layout_gravity" format="integer" />
+
+    </declare-styleable>
+
+</resources>

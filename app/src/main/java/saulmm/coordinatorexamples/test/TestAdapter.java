@@ -29,6 +29,15 @@ public class TestAdapter extends RecyclerView.Adapter{
         }
     }
 
+    public void addAll(List<String> list) {
+        if(list == null || list.isEmpty()) {
+            return;
+        }
+        int start = this.data.size();
+        this.data.addAll(list);
+        this.notifyItemRangeInserted(start, list.size());
+    }
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());

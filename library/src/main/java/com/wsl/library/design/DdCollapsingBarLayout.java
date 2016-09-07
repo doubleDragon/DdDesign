@@ -143,9 +143,9 @@ public class DdCollapsingBarLayout extends ViewGroup {
             if (child.getVisibility() == GONE) {
                 continue;
             }
+            measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0);
             int childWidth = child.getMeasuredWidth();
             int childHeight = child.getMeasuredHeight();
-            measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0);
             final LayoutParams lp = (LayoutParams) child.getLayoutParams();
 
             maxWidth = Math.max(maxWidth, childWidth + lp.leftMargin + lp.rightMargin);
