@@ -1,6 +1,7 @@
 package com.wsl.library.design;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,8 @@ public class DdSecondLayout extends ViewGroup {
         int maxHeight = 0;
         int childState = 0;
 
+        boolean setMinHeight = false;
+
         //measure content
         int count = getChildCount();
         for (int i = 0; i < count; i++) {
@@ -47,6 +50,11 @@ public class DdSecondLayout extends ViewGroup {
             maxWidth = Math.max(maxWidth, childWidth + lp.leftMargin + lp.rightMargin);
             maxHeight += childHeight + lp.topMargin + lp.bottomMargin;
             childState = combineMeasuredStates(childState, child.getMeasuredState());
+
+            if(lp.isMinimumHeight && !setMinHeight) {
+                setMinHeight = true;
+                setMinimumHeight(childHeight + lp.topMargin + lp.bottomMargin);
+            }
         }
 
         maxWidth = Math.max(maxWidth, getSuggestedMinimumWidth());
@@ -83,11 +91,6 @@ public class DdSecondLayout extends ViewGroup {
             childHeightSum += childHeight;
 
             child.layout(left, top, right, bottom);
-
-            if(i == count - 1) {
-                //set last child height to min height
-                setMinimumHeight(childHeight + lp.topMargin + lp.bottomMargin);
-            }
         }
     }
 
@@ -112,8 +115,14 @@ public class DdSecondLayout extends ViewGroup {
     }
 
     public static class LayoutParams extends MarginLayoutParams {
+
+        boolean isMinimumHeight;
+
         public LayoutParams(Context c, AttributeSet attrs) {
             super(c, attrs);
+            TypedArray a = c.obtainStyledAttributes(attrs, R.styleable.DdSecondLayout_LayoutParams);
+            isMinimumHeight = a.getBoolean(R.styleable.DdSecondLayout_LayoutParams_dd_minimum_height, false);
+            a.recycle();
         }
 
         public LayoutParams(int width, int height) {

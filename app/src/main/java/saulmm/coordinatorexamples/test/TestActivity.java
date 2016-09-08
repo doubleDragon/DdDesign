@@ -3,6 +3,7 @@ package saulmm.coordinatorexamples.test;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -48,6 +49,9 @@ public class TestActivity extends AppCompatActivity{
     @BindView(R.id.rv_content)
     RecyclerView rvContent;
 
+    @BindView(R.id.tabLayout)
+    TabLayout tabLayout;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +78,10 @@ public class TestActivity extends AppCompatActivity{
         rvHeader.setLayoutManager(new LinearLayoutManager(this));
         rvHeader.setItemAnimator(new DefaultItemAnimator());
         rvHeader.setAdapter(headerAdapter);
+
+        tabLayout.addTab(tabLayout.newTab().setText("tab0"));
+        tabLayout.addTab(tabLayout.newTab().setText("tab1"));
+        tabLayout.addTab(tabLayout.newTab().setText("tab2"));
 
         rvContent.setHasFixedSize(true);
         rvContent.setLayoutManager(new LinearLayoutManager(this));

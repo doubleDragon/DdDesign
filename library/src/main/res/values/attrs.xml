@@ -29,4 +29,8 @@
         <attr name="dd_vertical_offset" format="boolean"/>
     </declare-styleable>
 
+    <declare-styleable name="DdSecondLayout_LayoutParams">
+        <attr name="dd_minimum_height" format="boolean"/>
+    </declare-styleable>
+
 </resources>
