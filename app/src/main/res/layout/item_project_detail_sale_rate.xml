@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    app:layout_scrollFlags="scroll">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <com.github.ornolfr.ratingview.RatingView
+            android:id="@+id/goodsRatingView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="15dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginStart="3dp"
+            android:foregroundGravity="bottom"
+            app:drawable_empty="@mipmap/ic_16_star_normal"
+            app:drawable_filled="@mipmap/ic_16_star_selected"
+            app:drawable_half="@mipmap/ic_16_star_half"
+            app:drawable_size="10dp"
+            app:is_indicator="true"
+            app:max_count="5"
+            app:rating="3.5" />
+
+        <TextView
+            android:id="@+id/tv_comment_project_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/comment_project_score"
+            android:textColor="#333"
+            android:textSize="11sp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/tv_comment_project_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="3dp"
+            android:text="@string/comment_project_num"
+            android:textColor="#999"
+            android:textSize="11sp" />
+
+        <ImageView
+            android:id="@+id/iv_pointer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="7dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="7dp"
+            android:layout_marginStart="10dp"
+            android:contentDescription="@null"
+            android:padding="3dp"
+            android:src="@mipmap/ic_pointer" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/common_divider" />
+
+    <com.zhy.view.flowlayout.TagFlowLayout
+        android:id="@+id/flowLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:visibility="visible"
+        app:auto_select_effect="true"
+        app:max_select="-1"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:background="@color/common_big_divider" />
+
+</LinearLayout>

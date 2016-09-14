@@ -5,4 +5,7 @@
     <color name="common_green">#43AC43</color>
     <color name="common_white_stroke">#ccc</color>
 
+    <color name="common_divider">#EAECEE</color>
+    <color name="common_big_divider">#f5f6f7</color>
+
 </resources>

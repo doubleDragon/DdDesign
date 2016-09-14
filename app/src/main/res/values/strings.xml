@@ -43,4 +43,20 @@
 		\n\n Enjoy
 	</string>
 	<string name="swype.help">The \'Swipe to dismiss\' behavior allows you to easily add the \'Swipe to dismiss\' functionality in a View inside a CoordinatorLayout</string>
+
+
+	<string name="app_init_time_default">0次</string>
+	<string name="app_init_money_default">0元</string>
+	<string name="comment_project_detail_user_rate">卖家好评率 &lt;font color=\'#43AC43\'&gt;%1$s%%&lt;/font&gt;</string>
+	<string name="project_detail_consult">咨询</string>
+	<string name="project_detail_total_amount">目标金额</string>
+	<string name="project_detail_current_amount">已筹金额</string>
+	<string name="project_detail_backed_count">支持次数</string>
+	<string name="project_detail_view">查看项目详情</string>
+	<string name="project_detail_shipping_label_first">运费和发货时间</string>
+	<string name="project_detail_shipping_label_second">运费:</string>
+	<string name="project_detail_shipping_label_third">发货时间:</string>
+	<string name="comment_project_score">%1$s分</string>
+	<string name="comment_project_num">%1$s人评价</string>
+	<string name="comment_project_num_null">暂无评价</string>
 </resources>

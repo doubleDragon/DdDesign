@@ -9,11 +9,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.wsl.library.banner.DdBannerIndicator;
 import com.wsl.library.design.DdBarLayout;
 import com.wsl.library.design.DdCollapsingBarLayout;
+import com.zhy.view.flowlayout.FlowLayout;
+import com.zhy.view.flowlayout.TagAdapter;
+import com.zhy.view.flowlayout.TagFlowLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,9 +48,19 @@ public class TestActivity extends AppCompatActivity{
     @BindView(R.id.dd_banner_indicator)
     DdBannerIndicator bannerIndicator;
 
-    @BindView(R.id.rv_header)
-    RecyclerView rvHeader;
-    private TestAdapter headerAdapter;
+//    @BindView(R.id.rv_header)
+//    RecyclerView rvHeader;
+//    private TestAdapter headerAdapter;
+
+//    @BindView(R.id.tv_header0)
+//    TextView tvHeader0;
+//    @BindView(R.id.tv_header1)
+//    TextView tvHeader1;
+//    @BindView(R.id.tv_header2)
+//    TextView tvHeader2;
+
+    @BindView(R.id.flowLayout)
+    TagFlowLayout flowLayout;
 
     @BindView(R.id.rv_content)
     RecyclerView rvContent;
@@ -73,11 +89,25 @@ public class TestActivity extends AppCompatActivity{
         bannerPager.setAdapter(adapter);
         bannerIndicator.setupViewpager(bannerPager);
 
-        headerAdapter = new TestAdapter(0);
-        rvHeader.setHasFixedSize(false);
-        rvHeader.setLayoutManager(new LinearLayoutManager(this));
-        rvHeader.setItemAnimator(new DefaultItemAnimator());
-        rvHeader.setAdapter(headerAdapter);
+//        headerAdapter = new TestAdapter(0);
+//        rvHeader.setHasFixedSize(false);
+//        rvHeader.setLayoutManager(new LinearLayoutManager(this));
+//        rvHeader.setItemAnimator(new DefaultItemAnimator());
+//        rvHeader.setAdapter(headerAdapter);
+
+        List<String> tags = new ArrayList<>();
+        for(int i =0;i <10; i++) {
+            tags.add("tag: " + i);
+        }
+        TagAdapter<String> tagAdapter = new TagAdapter<String>(tags) {
+            @Override
+            public View getView(FlowLayout parent, int position, String s) {
+                TextView textView = new TextView(TestActivity.this);
+                textView.setText(s);
+                return textView;
+            }
+        };
+        flowLayout.setAdapter(tagAdapter);
 
         tabLayout.addTab(tabLayout.newTab().setText("tab0"));
         tabLayout.addTab(tabLayout.newTab().setText("tab1"));
@@ -90,13 +120,9 @@ public class TestActivity extends AppCompatActivity{
     }
 
     private void post() {
-        rvHeader.postDelayed(new Runnable() {
+        rvContent.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.d("post", "ssss");
-                headerAdapter.addAll(getDelayData());
-                barParent.requestLayout();
-//                clParent.dispatchDependentViewsChanged(rvHeader);
             }
         }, 2000);
     }
@@ -107,5 +133,11 @@ public class TestActivity extends AppCompatActivity{
             list.add("delay :" + i);
         }
         return list;
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+//        Log.d("test", "onWindowFocusChanged height: " + tvHeader0.getHeight());
     }
 }

@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.WindowInsetsCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -159,6 +160,7 @@ public class DdCollapsingBarLayout extends ViewGroup {
                     break;
                 case LayoutParams.COLLAPSE_MODE_OFF:
                     //view index 2
+                    Log.d("measure", "off mode height: " + (childHeight + lp.topMargin + lp.bottomMargin));
                     maxHeight += childHeight + lp.topMargin + lp.bottomMargin;
                     break;
             }
