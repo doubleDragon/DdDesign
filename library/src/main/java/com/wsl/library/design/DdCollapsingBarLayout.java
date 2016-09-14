@@ -160,7 +160,6 @@ public class DdCollapsingBarLayout extends ViewGroup {
                     break;
                 case LayoutParams.COLLAPSE_MODE_OFF:
                     //view index 2
-                    Log.d("measure", "off mode height: " + (childHeight + lp.topMargin + lp.bottomMargin));
                     maxHeight += childHeight + lp.topMargin + lp.bottomMargin;
                     break;
             }
