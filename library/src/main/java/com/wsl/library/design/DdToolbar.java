@@ -139,7 +139,7 @@ public class DdToolbar extends LinearLayout {
                 LayoutParams lp = (LayoutParams) child.getLayoutParams();
                 if (lp.isChangeAlpha()) {
                     Drawable drawable = child.getBackground();
-                    if (drawable != null && drawable.getAlpha() != alpha) {
+                    if (drawable != null) {
                         drawable.setAlpha(alpha);
                     }
                 }
