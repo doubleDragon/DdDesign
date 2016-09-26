@@ -12,6 +12,7 @@ public class DdUtil {
     public static String dumpView(View view) {
         StringBuilder sb = new StringBuilder();
         sb.append(view.getClass().getSimpleName());
+        sb.append(" id=").append(view.getId());
         sb.append("[");
         sb.append(view.getLeft()).append(",").append(view.getTop()).append(",").append(view.getRight()).append(",").append(view.getBottom());
         sb.append("]");

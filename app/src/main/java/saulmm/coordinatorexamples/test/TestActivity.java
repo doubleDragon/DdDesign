@@ -9,8 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -32,7 +30,7 @@ import saulmm.coordinatorexamples.R;
  * Created by wsl on 16-8-25.
  */
 
-public class TestActivity extends AppCompatActivity{
+public class TestActivity extends AppCompatActivity {
 
     @BindView(R.id.cl_parent)
     CoordinatorLayout clParent;
@@ -96,7 +94,7 @@ public class TestActivity extends AppCompatActivity{
 //        rvHeader.setAdapter(headerAdapter);
 
         List<String> tags = new ArrayList<>();
-        for(int i =0;i <10; i++) {
+        for (int i = 0; i < 10; i++) {
             tags.add("tag: " + i);
         }
         TagAdapter<String> tagAdapter = new TagAdapter<String>(tags) {
@@ -129,7 +127,7 @@ public class TestActivity extends AppCompatActivity{
 
     private List<String> getDelayData() {
         List<String> list = new ArrayList<>(10);
-        for(int i=0; i<10; i++) {
+        for (int i = 0; i < 10; i++) {
             list.add("delay :" + i);
         }
         return list;

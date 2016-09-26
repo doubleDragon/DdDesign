@@ -10,6 +10,7 @@ import android.support.v4.os.ParcelableCompatCreatorCallbacks;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.WindowInsetsCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -282,11 +283,15 @@ public class DdBarLayout extends ViewGroup {
 
         @Override
         public boolean onStartNestedScroll(CoordinatorLayout parent, DdBarLayout child, View directTargetChild, View target, int nestedScrollAxes) {
+            boolean canScrollDown = !ViewCompat.canScrollVertically(target, -1);
+            // just started nested scroll when target first item display totally
+//            Log.d("test", "target :" + DdUtil.dumpView(target) + "---canScrollDown: " + canScrollDown);
             // Return true if we're nested scrolling vertically, and we have scrollable children
             // and the scrolling view is big enough to scroll
             final boolean started = (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0
                     && child.hasScrollableChildren()
-                    && parent.getHeight() - directTargetChild.getHeight() <= child.getHeight();
+                    && parent.getHeight() - directTargetChild.getHeight() <= child.getHeight()
+                    && canScrollDown;
 
             if (started && mAnimator != null) {
                 // Cancel any offset animation
