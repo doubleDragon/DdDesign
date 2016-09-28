@@ -1,7 +1,12 @@
 package com.wsl.library.design;
 
+import android.content.Context;
+import android.graphics.Point;
+import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 
 /**
  * Created by wsl on 16-8-23.
@@ -24,5 +29,13 @@ public class DdUtil {
         sb.append(event.getAction());
         sb.append("[").append(event.getX()).append(",").append(event.getY()).append("]");
         return sb.toString();
+    }
+
+    public static int getScreenHeight(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        return size.y;
     }
 }

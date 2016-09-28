@@ -40,7 +40,8 @@ public class DdCollapsingBarLayout extends ViewGroup {
     private boolean mScrimsAreShown;
     private ValueAnimatorCompat mScrimAnimator;
 
-    private DdBarLayout.OnOffsetChangedListener mOnOffsetChangedListener;
+    private DdBarLayout.OnOffsetChangedListener mOnOffsetChangedBarListener;
+    private DdHeaderLayout.OnOffsetChangedListener mOnOffsetChangedHeaderListener;
 
     private int mCurrentOffset;
     private int mOffHeight = INVALID_HEIGHT_PX;
@@ -113,10 +114,15 @@ public class DdCollapsingBarLayout extends ViewGroup {
         // Add an OnOffsetChangedListener if possible
         final ViewParent parent = getParent();
         if (parent instanceof DdBarLayout) {
-            if (mOnOffsetChangedListener == null) {
-                mOnOffsetChangedListener = new DdCollapsingBarLayout.OffsetUpdateListener();
+            if (mOnOffsetChangedBarListener == null) {
+                mOnOffsetChangedBarListener = new DdCollapsingBarLayout.BarOffsetUpdateListener();
             }
-            ((DdBarLayout) parent).addOnOffsetChangedListener(mOnOffsetChangedListener);
+            ((DdBarLayout) parent).addOnOffsetChangedListener(mOnOffsetChangedBarListener);
+        } else if(parent instanceof DdHeaderLayout) {
+            if (mOnOffsetChangedHeaderListener == null) {
+                mOnOffsetChangedHeaderListener = new DdCollapsingBarLayout.HeaderOffsetUpdateListener();
+            }
+            ((DdHeaderLayout) parent).addOnOffsetChangedListener(mOnOffsetChangedHeaderListener);
         }
     }
 
@@ -124,8 +130,12 @@ public class DdCollapsingBarLayout extends ViewGroup {
     protected void onDetachedFromWindow() {
         // Remove our OnOffsetChangedListener if possible and it exists
         final ViewParent parent = getParent();
-        if (mOnOffsetChangedListener != null && parent instanceof DdBarLayout) {
-            ((DdBarLayout) parent).removeOnOffsetChangedListener(mOnOffsetChangedListener);
+        if (mOnOffsetChangedBarListener != null && parent instanceof DdBarLayout) {
+            ((DdBarLayout) parent).removeOnOffsetChangedListener(mOnOffsetChangedBarListener);
+        }
+
+        if (mOnOffsetChangedHeaderListener != null && parent instanceof DdHeaderLayout) {
+            ((DdHeaderLayout) parent).removeOnOffsetChangedListener(mOnOffsetChangedHeaderListener);
         }
 
         super.onDetachedFromWindow();
@@ -477,9 +487,92 @@ public class DdCollapsingBarLayout extends ViewGroup {
         }
     }
 
-    private class OffsetUpdateListener implements DdBarLayout.OnOffsetChangedListener {
+    private class BarOffsetUpdateListener implements DdBarLayout.OnOffsetChangedListener {
         @Override
         public void onOffsetChanged(DdBarLayout layout, int verticalOffset) {
+            mCurrentOffset = verticalOffset;
+
+            final int insetTop = mLastInsets != null ? mLastInsets.getSystemWindowInsetTop() : 0;
+            int offHeight = getOffHeight();
+            for (int i = 0, z = getChildCount(); i < z; i++) {
+                final View child = getChildAt(i);
+                final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+                final ViewOffsetHelper offsetHelper = getViewOffsetHelper(child);
+
+                switch (lp.collapseMode) {
+                    case LayoutParams.COLLAPSE_MODE_PIN:
+//                        if (getHeight() - offHeight - insetTop + verticalOffset >= getMinimumHeight()) {
+//                            child.setAlpha(0f);
+//                        } else {
+//                            child.setAlpha(1f);
+//                        }
+                        //update alpha in draw method by param mScrimAlpha
+                        offsetHelper.setTopAndBottomOffset(-verticalOffset);
+                        break;
+                    case LayoutParams.COLLAPSE_MODE_PARALLAX:
+                        offsetHelper.setTopAndBottomOffset(
+                                Math.round(-verticalOffset * lp.mParallaxMult));
+                        break;
+//                    case LayoutParams.COLLAPSE_MODE_OFF:
+//                        if (getHeight() - offHeight - insetTop + verticalOffset < getMinimumHeight()) {
+//                            offsetHelper.setTopAndBottomOffset(verticalOffset);
+//                        }
+//                        break;
+                }
+            }
+
+            // Show or hide the scrims if needed
+            if (mContentScrim != null || mStatusBarScrim != null) {
+                int scrimTriggerOffset = getScrimTriggerOffset();
+                int delta = getHeight() - insetTop - offHeight;
+                //scrim显示的临界点
+                int scrimDelta = delta - scrimTriggerOffset;
+//                setScrimsShown(getHeight() - offHeight + verticalOffset < scrimTriggerOffset + insetTop);
+                setScrimsShown(scrimDelta < -verticalOffset);
+
+                //parallax View完全被隐藏起来的临界点,超过临界点后DdBarLayout向上偏移的同时ContentScrim向下偏移
+                int contentScrimDelta = delta - scrimTriggerOffset / 2;
+                if (-verticalOffset > contentScrimDelta) {
+                    mContentScrimOffset = -verticalOffset - contentScrimDelta;
+                } else {
+                    mContentScrimOffset = 0;
+                }
+                //4.4版本下drawChild不调用,这个地方判断版本并强制触发
+                if (mContentScrimOffset > 0 && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                    ViewCompat.postInvalidateOnAnimation(DdCollapsingBarLayout.this);
+                }
+
+                //子View根绝offset做动画
+//                if(-verticalOffset > scrimDelta && -verticalOffset <= contentScrimDelta){
+//
+//                }
+                dispatchOffsetToChild(scrimDelta, contentScrimDelta, verticalOffset);
+            }
+
+            if (mStatusBarScrim != null && insetTop > 0) {
+                ViewCompat.postInvalidateOnAnimation(DdCollapsingBarLayout.this);
+            }
+
+            // Update the collapsing text's fraction
+//            final int expandRange = getHeight() - ViewCompat.getMinimumHeight(
+//                    CollapsingToolbarLayout.this) - insetTop;
+//            mCollapsingTextHelper.setExpansionFraction(
+//                    Math.abs(verticalOffset) / (float) expandRange);
+
+//            if (Math.abs(verticalOffset) == scrollRange) {
+//                // If we have some pinned children, and we're offset to only show those views,
+//                // we want to be elevate
+//                ViewCompat.setElevation(layout, layout.getTargetElevation());
+//            } else {
+//                // Otherwise, we're inline with the content
+//                ViewCompat.setElevation(layout, 0f);
+//            }
+        }
+    }
+
+    private class HeaderOffsetUpdateListener implements DdHeaderLayout.OnOffsetChangedListener {
+        @Override
+        public void onOffsetChanged(DdHeaderLayout appBarLayout, int verticalOffset) {
             mCurrentOffset = verticalOffset;
 
             final int insetTop = mLastInsets != null ? mLastInsets.getSystemWindowInsetTop() : 0;

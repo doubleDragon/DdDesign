@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.wsl.library.design.DdHeaderLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/ll_header"
+<com.wsl.library.design.DdLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <include layout="@layout/item_project_detail_sale_header" />
 
     <include layout="@layout/item_project_detail_sale_shipping" />
-    <include layout="@layout/item_project_detail_sale_rate"/>
 
-</com.wsl.library.design.DdHeaderLayout>
+    <include layout="@layout/item_project_detail_sale_rate" />
+
+</com.wsl.library.design.DdLinearLayout>

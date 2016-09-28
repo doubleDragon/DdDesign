@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <com.wsl.library.design.DdBarLayout
+    <com.wsl.library.design.DdHeaderLayout
         android:id="@+id/bar_parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -59,12 +59,12 @@
         </com.wsl.library.design.DdSecondLayout>
 
 
-    </com.wsl.library.design.DdBarLayout>
+    </com.wsl.library.design.DdHeaderLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_behavior="com.wsl.library.design.DdBarLayout$ScrollingViewBehavior" />
+        app:layout_behavior="com.wsl.library.design.DdHeaderLayout$ScrollingViewBehavior" />
 
 </android.support.design.widget.CoordinatorLayout>

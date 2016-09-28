@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.wsl.library.banner.DdBannerIndicator;
 import com.wsl.library.design.DdBarLayout;
 import com.wsl.library.design.DdCollapsingBarLayout;
+import com.wsl.library.design.DdHeaderLayout;
 import com.zhy.view.flowlayout.FlowLayout;
 import com.zhy.view.flowlayout.TagAdapter;
 import com.zhy.view.flowlayout.TagFlowLayout;
@@ -39,7 +40,7 @@ public class TestActivity extends AppCompatActivity {
     DdCollapsingBarLayout cbBar;
 
     @BindView(R.id.bar_parent)
-    DdBarLayout barParent;
+    DdHeaderLayout barParent;
 
     @BindView(R.id.dd_banner_viewpager)
     ViewPager bannerPager;

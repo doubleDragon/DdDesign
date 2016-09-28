@@ -283,9 +283,9 @@ public class DdBarLayout extends ViewGroup {
 
         @Override
         public boolean onStartNestedScroll(CoordinatorLayout parent, DdBarLayout child, View directTargetChild, View target, int nestedScrollAxes) {
-            boolean canScrollDown = !ViewCompat.canScrollVertically(target, -1);
             // just started nested scroll when target first item display totally
-//            Log.d("test", "target :" + DdUtil.dumpView(target) + "---canScrollDown: " + canScrollDown);
+            boolean canScrollDown = !ViewCompat.canScrollVertically(target, -1);
+
             // Return true if we're nested scrolling vertically, and we have scrollable children
             // and the scrolling view is big enough to scroll
             final boolean started = (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0
