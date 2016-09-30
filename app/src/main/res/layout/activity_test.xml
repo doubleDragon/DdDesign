@@ -10,7 +10,8 @@
         android:id="@+id/bar_parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="true"
+        app:ready_offset="50dp">
 
         <com.wsl.library.design.DdCollapsingBarLayout
             android:id="@+id/cb_bar"
@@ -65,6 +66,22 @@
         android:id="@+id/rv_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
         app:layout_behavior="com.wsl.library.design.DdHeaderLayout$ScrollingViewBehavior" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/app_name"
+            android:gravity="center"
+            android:background="#343"
+            />
+
+    </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

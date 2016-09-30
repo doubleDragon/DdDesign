@@ -3,8 +3,13 @@
 
     <attr name="overlapTop" format="dimension" />
 
+    <declare-styleable name="DdHeaderLayout">
+        <attr name="ready_offset" format="dimension" />
+    </declare-styleable>
+
     <declare-styleable name="DdHeaderLayout_LayoutParams">
         <attr name="overlapTop" />
+
     </declare-styleable>
 
     <declare-styleable name="DdBarLayout_LayoutParams">

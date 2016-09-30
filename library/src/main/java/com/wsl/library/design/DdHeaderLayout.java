@@ -43,7 +43,8 @@ public class DdHeaderLayout extends ViewGroup {
 
     private final List<OnOffsetChangedListener> mListeners = new ArrayList<>();
 
-    private boolean debug;
+    private int mReadyOffset;
+    private boolean mDebug;
 
     public DdHeaderLayout(Context context) {
         this(context, null);
@@ -70,10 +71,14 @@ public class DdHeaderLayout extends ViewGroup {
                         return insets.consumeSystemWindowInsets();
                     }
                 });
+
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.DdHeaderLayout);
+        mReadyOffset = a.getDimensionPixelSize(R.styleable.DdHeaderLayout_ready_offset, 0);
+        a.recycle();
     }
 
     private void setDebug(boolean debug) {
-        this.debug = debug;
+        this.mDebug = debug;
     }
 
     public void addOnOffsetChangedListener(DdHeaderLayout.OnOffsetChangedListener listener) {
@@ -226,6 +231,7 @@ public class DdHeaderLayout extends ViewGroup {
                 break;
             }
         }
+        range += mReadyOffset;
         return mBottomStableChildReadyVisibleScrollRange = range;
     }
 
@@ -539,7 +545,7 @@ public class DdHeaderLayout extends ViewGroup {
                     consumed = curOffset - newOffset;
                     // Update the stored sibling offset
                     mOffsetDelta = newOffset - interpolatedOffset;
-                    if(header.debug) {
+                    if(header.mDebug) {
                         Log.d("debug", "setHeaderTopBottomOffset " + interpolatedOffset + "---isBeingDragged(): " + isBeingDragged());
                     }
 
