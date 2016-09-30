@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.widget.OverScroller;
 
 /**
  * Created by wsl on 16-8-23.
@@ -28,16 +29,26 @@ abstract class DdHeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
      * 第一页置底
      */
     public static final int SCROLL_STATE_STABLE_CHILD_READY = 1;
+
+    /**
+     * 1和3的中间状态
+     */
+    public static final int SCROLL_STATE_STABLE_CHILD_MIDDLE = 2;
+
     /**
      * 第二页置顶
      */
-    public static final int SCROLL_STATE_STABLE_CHILD_VISIBLE = 2;
+    public static final int SCROLL_STATE_STABLE_CHILD_TOP = 3;
+
+    public static final int DEFAULT_AUTO_SCROLL_DURATION = 500;
+
 
     private static final int INVALID_POINTER = -1;
 
     private Runnable mFlingRunnable;
     private Runnable mAutoScrollRunnable;
     private ScrollerCompat mScroller;
+    private OverScroller mAutoScroller;
 
     private boolean mIsBeingDragged;
     private int mActivePointerId = INVALID_POINTER;
@@ -76,6 +87,7 @@ abstract class DdHeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
                     mLastMotionY = y;
                     mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
                     ensureVelocityTracker();
+                    abortAutoScroll(child);
                 }
                 break;
             }
@@ -115,7 +127,6 @@ abstract class DdHeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
         if (mVelocityTracker != null) {
             mVelocityTracker.addMovement(ev);
         }
-
         return mIsBeingDragged;
     }
 
@@ -124,7 +135,6 @@ abstract class DdHeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
         if (mTouchSlop < 0) {
             mTouchSlop = ViewConfiguration.get(parent.getContext()).getScaledTouchSlop();
         }
-
         switch (MotionEventCompat.getActionMasked(ev)) {
             case MotionEvent.ACTION_DOWN: {
                 final int x = (int) ev.getX();
@@ -174,19 +184,38 @@ abstract class DdHeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
                     float yvel = VelocityTrackerCompat.getYVelocity(mVelocityTracker,
                             mActivePointerId);
 
-                    if (mScrollState == SCROLL_STATE_STABLE_CHILD_INVISIBLE) {
-                        fling(parent, child, -getScrollRangeForDragFling(child), 0, yvel);
-                    } else if(mScrollState == SCROLL_STATE_STABLE_CHILD_READY){
-                        if(isScrollUpWhenReady(child)) {
-                            autoScroll(parent, child, getScrollRangeForDragAutoScroll(child), 600);
+                    boolean needAutoScroll = false;
+                    switch (mScrollState) {
+                        case SCROLL_STATE_STABLE_CHILD_INVISIBLE:
+                            fling(parent, child, -getOffsetWhenReadyState(child), 0, yvel);
+                            break;
+                        case SCROLL_STATE_STABLE_CHILD_READY:
+                            if(!isScrollUpWhenReady(child)) {
+                                fling(parent, child, -getOffsetWhenReadyState(child), 0, yvel);
+                            } else {
+                                needAutoScroll = true;
+                            }
+                            break;
+                        case SCROLL_STATE_STABLE_CHILD_MIDDLE:
+                            needAutoScroll = true;
+                            break;
+                        case SCROLL_STATE_STABLE_CHILD_TOP:
+                            if(!isScrollUpWhenTop(child)) {
+                                //visible状态下向下滑动时auto scroll
+                                needAutoScroll = true;
+                            }
+                            break;
+                    }
+                    if(needAutoScroll) {
+                        int dy;
+                        if(yvel > 0) {
+                            //We're scrolling down, need auto scroll to ready state
+                            dy = -getTopBottomOffsetForScrollingSibling() - getOffsetWhenReadyState(child);
                         } else {
-                            fling(parent, child, -getScrollRangeForDragFling(child), 0, yvel);
+                            //We're scrolling up, need auto scroll to top state
+                            dy = -getTopBottomOffsetForScrollingSibling() - getOffsetWhenTopState(child);
                         }
-                    } else if(mScrollState == SCROLL_STATE_STABLE_CHILD_VISIBLE) {
-                        if(!isScrollUpWhenVisible(child)) {
-                            //visible状态下向下滑动时auto scroll
-                            autoScroll(parent, child, getScrollRangeForDragAutoScroll(child), 600);
-                        }
+                        autoScroll(parent, child, dy);
                     }
                 }
                 // $FALLTHROUGH
@@ -217,7 +246,7 @@ abstract class DdHeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
         return false;
     }
 
-    boolean isScrollUpWhenVisible(V view) {
+    boolean isScrollUpWhenTop(V view) {
         return false;
     }
 
@@ -230,6 +259,14 @@ abstract class DdHeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
 
     int getScrollState() {
         return this.mScrollState;
+    }
+
+    int getOffsetWhenReadyState(V header) {
+        return header.getHeight();
+    }
+
+    int getOffsetWhenTopState(V header) {
+        return header.getHeight();
     }
 
     int setHeaderTopBottomOffset(CoordinatorLayout parent, V header, int newOffset) {
@@ -263,9 +300,12 @@ abstract class DdHeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
 
     final int scroll(CoordinatorLayout coordinatorLayout, V header,
                      int dy, int minOffset, int maxOffset) {
-        Log.d("test", "scroll dy: " + dy + "---minOffset: " + minOffset + "---maxOffset: " + maxOffset);
         return setHeaderTopBottomOffset(coordinatorLayout, header,
                 getTopBottomOffsetForScrollingSibling() - dy, minOffset, maxOffset);
+    }
+
+    final boolean autoScroll(CoordinatorLayout coordinatorLayout, V layout, int dy) {
+        return autoScroll(coordinatorLayout, layout, dy, DEFAULT_AUTO_SCROLL_DURATION);
     }
 
     final boolean autoScroll(CoordinatorLayout coordinatorLayout, V layout, int dy, int duration) {
@@ -274,17 +314,28 @@ abstract class DdHeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
             mAutoScrollRunnable = null;
         }
 
-        if (mScroller == null) {
-            mScroller = ScrollerCompat.create(layout.getContext());
+        if (mAutoScroller == null) {
+            mAutoScroller = new OverScroller(layout.getContext());
         }
-        Log.d("test", "fling startY: " + getTopAndBottomOffset() + "---dy: " + dy + "---maxOffset: ");
-        mScroller.startScroll(0, getTopAndBottomOffset(), 0, dy, duration);
-        if (mScroller.computeScrollOffset()) {
-            mAutoScrollRunnable = new DdHeaderBehavior.FlingRunnable(coordinatorLayout, layout);
+        mAutoScroller.startScroll(0, getTopAndBottomOffset(), 0, dy, duration);
+        if (mAutoScroller.computeScrollOffset()) {
+            mAutoScrollRunnable = new DdHeaderBehavior.AutoScrollRunnable(coordinatorLayout, layout);
             ViewCompat.postOnAnimation(layout, mAutoScrollRunnable);
             return true;
         }
         return false;
+    }
+
+    final void abortAutoScroll(V layout) {
+        if (mAutoScrollRunnable != null) {
+            layout.removeCallbacks(mAutoScrollRunnable);
+            mAutoScrollRunnable = null;
+        }
+        if(mAutoScroller != null) {
+            if(!mAutoScroller.isFinished()) {
+                mAutoScroller.forceFinished(true);
+            }
+        }
     }
 
     final boolean fling(CoordinatorLayout coordinatorLayout, V layout, int minOffset,
@@ -298,14 +349,12 @@ abstract class DdHeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
             mScroller = ScrollerCompat.create(layout.getContext());
         }
 
-        Log.d("test", "fling velocityY: " + velocityY + "---minOffset: " + minOffset + "---maxOffset: " + maxOffset + "---startY : " + getTopAndBottomOffset());
         mScroller.fling(
                 0, getTopAndBottomOffset(), // curr
                 0, Math.round(velocityY), // velocity.
                 0, 0, // x
                 minOffset, maxOffset); // y
 
-        Log.d("test", "fling final y: " + mScroller.getFinalY() + "---curr y: " + mScroller.getCurrY());
         if (mScroller.computeScrollOffset()) {
             mFlingRunnable = new DdHeaderBehavior.FlingRunnable(coordinatorLayout, layout);
             ViewCompat.postOnAnimation(layout, mFlingRunnable);
@@ -328,14 +377,6 @@ abstract class DdHeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
         return -view.getHeight();
     }
 
-    int getScrollRangeForDragFling(V view) {
-        return view.getHeight();
-    }
-
-    int getScrollRangeForDragAutoScroll(V view) {
-        return view.getHeight();
-    }
-
     private void ensureVelocityTracker() {
         if (mVelocityTracker == null) {
             mVelocityTracker = VelocityTracker.obtain();
@@ -354,8 +395,27 @@ abstract class DdHeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
         @Override
         public void run() {
             if (mLayout != null && mScroller != null && mScroller.computeScrollOffset()) {
-                Log.d("test", "FlingRunnable newOffset: " + mScroller.getCurrY());
                 setHeaderTopBottomOffset(mParent, mLayout, mScroller.getCurrY());
+
+                // Post ourselves so that we run on the next animation
+                ViewCompat.postOnAnimation(mLayout, this);
+            }
+        }
+    }
+
+    private class AutoScrollRunnable implements Runnable {
+        private final CoordinatorLayout mParent;
+        private final V mLayout;
+
+        AutoScrollRunnable(CoordinatorLayout parent, V layout) {
+            mParent = parent;
+            mLayout = layout;
+        }
+
+        @Override
+        public void run() {
+            if (mLayout != null && mAutoScroller != null && mAutoScroller.computeScrollOffset()) {
+                setHeaderTopBottomOffset(mParent, mLayout, mAutoScroller.getCurrY());
 
                 // Post ourselves so that we run on the next animation
                 ViewCompat.postOnAnimation(mLayout, this);

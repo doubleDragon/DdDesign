@@ -39,11 +39,11 @@ public class DdHeaderLayout extends ViewGroup {
     private int mDownScrollRange = INVALID_SCROLL_RANGE;
     private int mBottomStableChildReadyVisibleScrollRange = INVALID_SCROLL_RANGE;//超出屏幕部分的滑动偏移
 
-    private int mScreenHeight;
-
     private WindowInsetsCompat mLastInsets;
 
     private final List<OnOffsetChangedListener> mListeners = new ArrayList<>();
+
+    private boolean debug;
 
     public DdHeaderLayout(Context context) {
         this(context, null);
@@ -72,11 +72,8 @@ public class DdHeaderLayout extends ViewGroup {
                 });
     }
 
-    private int getScreenHeight() {
-        if (mScreenHeight == 0) {
-            mScreenHeight = DdUtil.getScreenHeight(getContext());
-        }
-        return mScreenHeight;
+    private void setDebug(boolean debug) {
+        this.debug = debug;
     }
 
     public void addOnOffsetChangedListener(DdHeaderLayout.OnOffsetChangedListener listener) {
@@ -220,7 +217,7 @@ public class DdHeaderLayout extends ViewGroup {
             return mBottomStableChildReadyVisibleScrollRange;
         }
         int range = 0;
-        int overTotalHeight = getHeight() - getScreenHeight();
+        int overTotalHeight = getHeight() - DdUtil.getScreenHeight(getContext());
         int count = getChildCount();
         for (int i = count - 1; i >= 0; i--) {
             final View child = getChildAt(i);
@@ -327,6 +324,8 @@ public class DdHeaderLayout extends ViewGroup {
                 // Cancel any offset animation
                 mAnimator.cancel();
             }
+            //cancel auto scroll
+            abortAutoScroll(child);
 
             // A new nested scroll has started so clear out the previous ref
             mLastNestedScrollingChildRef = null;
@@ -367,7 +366,8 @@ public class DdHeaderLayout extends ViewGroup {
                                        View target) {
             if (!mWasFlung) {
                 // If we haven't been flung then let's see if the current view has been set to snap
-//                snapToChildIfNeeded(coordinatorLayout, abl);
+                // onNestedPreFling　don't invoke, so trigger to top state
+                snapToChildIfNeeded(coordinatorLayout, abl);
             }
 
             // Reset the flags
@@ -378,42 +378,18 @@ public class DdHeaderLayout extends ViewGroup {
         }
 
         @Override
-        public boolean onNestedFling(final CoordinatorLayout coordinatorLayout,
-                                     final DdHeaderLayout child, View target, float velocityX, float velocityY,
-                                     boolean consumed) {
-
-            boolean flung = false;
-
-            if (!consumed) {
-                // It has been consumed so let's fling ourselves
-                flung = fling(coordinatorLayout, child, -child.getTotalScrollRange(),
-                        0, -velocityY);
+        public boolean onNestedPreFling(CoordinatorLayout coordinatorLayout, DdHeaderLayout child, View target, float velocityX, float velocityY) {
+            int dy;
+            if(velocityY < 0) {
+                //We're scrolling down, need auto scroll to ready state
+                dy = -getTopBottomOffsetForScrollingSibling() - child.getBottomStableChildReadyVisibleScrollRange();
             } else {
-                // If we're scrolling up and the child also consumed the fling. We'll fake scroll
-                // upto our 'collapsed' offset
-                if (velocityY < 0) {
-                    // We're scrolling down
-                    final int targetScroll = 0;
-                    if (getTopBottomOffsetForScrollingSibling() < targetScroll) {
-                        // If we're currently not expanded more than the target scroll, we'll
-                        // animate a fling
-                        animateOffsetTo(coordinatorLayout, child, targetScroll);
-                        flung = true;
-                    }
-                } else {
-                    // We're scrolling up
-                    final int targetScroll = -child.getTotalScrollRange();
-                    if (getTopBottomOffsetForScrollingSibling() > targetScroll) {
-                        // If we're currently not expanded less than the target scroll, we'll
-                        // animate a fling
-                        animateOffsetTo(coordinatorLayout, child, targetScroll);
-                        flung = true;
-                    }
-                }
+                //We're scrolling up, need auto scroll to top state
+                dy = -getTopBottomOffsetForScrollingSibling() - child.getTotalScrollRange();
             }
-
-            mWasFlung = flung;
-            return flung;
+            autoScroll(coordinatorLayout, child, dy);
+            mWasFlung = true;
+            return true;
         }
 
         /**
@@ -425,39 +401,19 @@ public class DdHeaderLayout extends ViewGroup {
         @Override
         int getMaxDragOffset(DdHeaderLayout view) {
             if (getScrollState() == SCROLL_STATE_STABLE_CHILD_INVISIBLE) {
-                Log.d("debug", "drag state invisible");
                 return -view.getBottomStableChildReadyVisibleScrollRange();
             }
-            Log.d("debug", "drag state other");
             return -view.getTotalScrollRange();
         }
 
-        /**
-         * drag过程中DdHeaderLayout根据当前状态计算fling的minOffset
-         *
-         * @param view
-         * @return
-         */
         @Override
-        int getScrollRangeForDragFling(DdHeaderLayout view) {
-            if (getScrollState() == SCROLL_STATE_STABLE_CHILD_INVISIBLE) {
-                Log.d("debug", "fling state invisible");
-                return view.getBottomStableChildReadyVisibleScrollRange();
-            } else if (getScrollState() == SCROLL_STATE_STABLE_CHILD_READY) {
-                Log.d("debug", "fling state ready");
-                int scrollSibling = -getTopBottomOffsetForScrollingSibling();
-                int stableChildReadyScrollRange = view.getBottomStableChildReadyVisibleScrollRange();
-                if (scrollSibling >= stableChildReadyScrollRange + view.getScreenHeight() / 2) {
-                    //在ready状态下上啦超过半屏则滚动到SCROLL_STATE_STABLE_CHILD_VISIBLE状态
-                    return view.getTotalScrollRange();
-                } else {
-                    //在ready状态下上啦不超过半屏则回滚到ready状态
-                    return view.getBottomStableChildReadyVisibleScrollRange();
-                }
-            } else {
-                Log.d("debug", "fling state other");
-                return view.getTotalScrollRange();
-            }
+        int getOffsetWhenReadyState(DdHeaderLayout header) {
+            return header.getBottomStableChildReadyVisibleScrollRange();
+        }
+
+        @Override
+        int getOffsetWhenTopState(DdHeaderLayout header) {
+            return header.getTotalScrollRange();
         }
 
         /**
@@ -478,46 +434,45 @@ public class DdHeaderLayout extends ViewGroup {
          * @return true　向上
          */
         @Override
-        boolean isScrollUpWhenVisible(DdHeaderLayout view) {
+        boolean isScrollUpWhenTop(DdHeaderLayout view) {
             int scrollSibling = -getTopBottomOffsetForScrollingSibling();
             return scrollSibling >= view.getTotalScrollRange();
         }
 
         /**
-         * 如果没超过一半则回滚到ready状态, 反之则Auto scroll到visible状态
-         *
-         * @param view DdHeaderLayout
-         * @return topBottomOff偏移量, 向上需要-xxx,向下则+xxx
+         * Top　or Middle 状态下滑动,根据滑动的距离决定是否回滚
+         * 判断标准:滑动超过半屏幕
+         * @return true 回滚
          */
-        @Override
-        int getScrollRangeForDragAutoScroll(DdHeaderLayout view) {
-            if (getScrollState() == SCROLL_STATE_STABLE_CHILD_INVISIBLE) {
-                return 0;
-            } else if (getScrollState() == SCROLL_STATE_STABLE_CHILD_READY) {
-                int scrollSibling = -getTopBottomOffsetForScrollingSibling();
-                int stableChildReadyScrollRange = view.getBottomStableChildReadyVisibleScrollRange();
-                if (scrollSibling >= stableChildReadyScrollRange + view.getScreenHeight() / 2) {
-                    //在ready状态下上拉超过半屏则滚动到SCROLL_STATE_STABLE_CHILD_VISIBLE状态,返回的是一个负值
-                    return -view.getTotalScrollRange() + scrollSibling;
-                } else {
-                    //在ready状态下上拉不超过半屏则回滚到ready状态,返回的是一个正值
-                    return scrollSibling - view.getBottomStableChildReadyVisibleScrollRange();
-                }
-            } else if (getScrollState() == SCROLL_STATE_STABLE_CHILD_VISIBLE) {
-                int scrollSibling = -getTopBottomOffsetForScrollingSibling();
-                int scrollSiblingTotal = view.getTotalScrollRange();
-                if (scrollSibling > (scrollSiblingTotal - view.getScreenHeight() / 2)) {
-                    //在visible状态下下拉不超过半屏则回滚到visible状态,返回的是一个负值
-                    return scrollSibling - scrollSiblingTotal;
-                } else {
-                    //在visible状态下下拉超过半屏滚动到ready状态,返回的是一个正值
-                    return scrollSibling - view.getBottomStableChildReadyVisibleScrollRange();
-                }
+        boolean isShouldSnapToOriginWhenVisible(DdHeaderLayout view) {
+            int scrollSibling = -getTopBottomOffsetForScrollingSibling();
+            int scrollSiblingTop = view.getTotalScrollRange();
+            int scrollSiblingReady = view.getBottomStableChildReadyVisibleScrollRange();
+            int temp = (scrollSiblingTop - scrollSiblingReady) / 2 + scrollSiblingReady;
+            if (scrollSibling > (temp)) {
+                return true;
             } else {
-                return 0;
+                return false;
             }
         }
 
+        /**
+         * Ready状态向上滑动,根据滑动的距离决定是否回滚
+         * 判断标准:滑动超过半屏幕
+         * @param view
+         * @return
+         */
+        boolean isShouldSnapToOriginWhenReady(DdHeaderLayout view) {
+            int scrollSibling = -getTopBottomOffsetForScrollingSibling();
+            int scrollSiblingReady = view.getBottomStableChildReadyVisibleScrollRange();
+            int scrollSiblingTop = view.getTotalScrollRange();
+            int temp = (scrollSiblingTop - scrollSiblingReady) / 2 + scrollSiblingReady;
+            if (scrollSibling < temp) {
+                return true;
+            } else {
+                return false;
+            }
+        }
 
         @Override
         boolean canDragView(DdHeaderLayout view) {
@@ -534,25 +489,10 @@ public class DdHeaderLayout extends ViewGroup {
             }
         }
 
-        private void snapToChildIfNeeded(CoordinatorLayout coordinatorLayout, DdHeaderLayout abl) {
-            final int offset = getTopBottomOffsetForScrollingSibling();
-            View offsetChild = null;
-            int overlapTop = 0;
-            for (int i = 0, count = abl.getChildCount(); i < count; i++) {
-                View child = abl.getChildAt(i);
-                if (i == 0 && child.getTop() <= -offset && child.getBottom() >= -offset) {
-                    offsetChild = child;
-                    continue;
-                }
-                DdHeaderLayout.LayoutParams lp = (LayoutParams) child.getLayoutParams();
-                overlapTop = lp.getOverlayTop();
-            }
-            if (offsetChild != null) {
-                // We're set the snap, so animate the offset to the nearest edge
-                final int childTop = -offsetChild.getTop();
-                final int childBottom = -(offsetChild.getBottom() - overlapTop);
-                animateOffsetTo(coordinatorLayout, abl,
-                        offset < (childBottom + childTop) / 2 ? childBottom : childTop);
+        private void snapToChildIfNeeded(CoordinatorLayout coordinatorLayout, DdHeaderLayout view) {
+            if(getScrollState() == SCROLL_STATE_STABLE_CHILD_MIDDLE) {
+                int dy = -getTopBottomOffsetForScrollingSibling() - getOffsetWhenTopState(view);
+                autoScroll(coordinatorLayout, view, dy);
             }
         }
 
@@ -599,8 +539,9 @@ public class DdHeaderLayout extends ViewGroup {
                     consumed = curOffset - newOffset;
                     // Update the stored sibling offset
                     mOffsetDelta = newOffset - interpolatedOffset;
-                    Log.d("debug", "setHeaderTopBottomOffset interpolatedOffset: " + interpolatedOffset + "---mOffsetDelta: " + mOffsetDelta + "---isBeingDragged(): " + isBeingDragged());
-
+                    if(header.debug) {
+                        Log.d("debug", "setHeaderTopBottomOffset " + interpolatedOffset + "---isBeingDragged(): " + isBeingDragged());
+                    }
 
                     if (!offsetChanged && ddBarLayout.hasChildWithInterpolator()) {
                         // If the offset hasn't changed and we're using an interpolated scroll
@@ -620,14 +561,13 @@ public class DdHeaderLayout extends ViewGroup {
                     int stableChildReadyScrollRange = header.getBottomStableChildReadyVisibleScrollRange();
                     int maxDragOffset = -getMaxDragOffset(header);
                     if (scrollSibling < stableChildReadyScrollRange) {
-                        Log.d("debug", "set state invisible");
                         setScrollState(SCROLL_STATE_STABLE_CHILD_INVISIBLE);
                     } else if (scrollSibling == stableChildReadyScrollRange) {
-                        Log.d("debug", "set state ready");
                         setScrollState(SCROLL_STATE_STABLE_CHILD_READY);
+                    } else if(scrollSibling > stableChildReadyScrollRange && scrollSibling < maxDragOffset) {
+                        setScrollState(SCROLL_STATE_STABLE_CHILD_MIDDLE);
                     } else if (scrollSibling == maxDragOffset) {
-                        Log.d("debug", "set state visible");
-                        setScrollState(SCROLL_STATE_STABLE_CHILD_VISIBLE);
+                        setScrollState(SCROLL_STATE_STABLE_CHILD_TOP);
                     }
                 }
             }
