@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -25,6 +26,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import saulmm.coordinatorexamples.R;
 
 /**
@@ -66,6 +68,14 @@ public class TestActivity extends AppCompatActivity {
 
     @BindView(R.id.tabLayout)
     TabLayout tabLayout;
+
+    @OnClick(R.id.iv_home) void onClickHome() {
+        Log.d("test", "click home");
+    }
+
+    @OnClick(R.id.iv_menu) void onClickMenu() {
+        Log.d("test", "click menu");
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

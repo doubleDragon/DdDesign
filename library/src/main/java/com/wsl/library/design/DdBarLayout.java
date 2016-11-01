@@ -229,7 +229,7 @@ public class DdBarLayout extends ViewGroup {
         public LayoutParams(Context context, AttributeSet attrs) {
             super(context, attrs);
             TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.DdBarLayout_LayoutParams);
-            overlayTop = a.getDimensionPixelSize(R.styleable.DdBarLayout_LayoutParams_overlapTop, 0);
+            overlayTop = a.getDimensionPixelSize(R.styleable.DdBarLayout_LayoutParams_dd_overlapTop, 0);
             a.recycle();
         }
 

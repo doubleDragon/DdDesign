@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.wsl.library.design.DdToolbar xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
+    android:background="?attr/colorPrimary"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    app:dd_offset_enable="true"
     app:dd_collapseMode="@integer/pin"
-    tools:background="#f00">
+    app:dd_offset_enable="false"
+    >
 
     <com.wsl.library.design.DdToolBarView
         android:id="@+id/iv_home"
@@ -16,9 +16,9 @@
         android:layout_height="match_parent"
         app:dd_change_alpha="true"
         app:dd_inner_drawable="@drawable/ic_home"
-        app:dd_outer_drawable="@drawable/ic_home_background"
         app:dd_inner_to_outer_padding="5dp"
-        app:dd_outer_alpha="0"/>
+        app:dd_outer_alpha="255"
+        app:dd_outer_drawable="@drawable/ic_home_background" />
 
     <TextView
         android:id="@+id/tv_title"
@@ -39,9 +39,8 @@
         android:layout_height="match_parent"
         app:dd_change_alpha="true"
         app:dd_inner_drawable="@drawable/ic_menu_manager"
-        app:dd_outer_drawable="@drawable/ic_menu_background"
         app:dd_inner_to_outer_padding="2dp"
-        app:dd_outer_alpha="0"
-        />
+        app:dd_outer_alpha="255"
+        app:dd_outer_drawable="@drawable/ic_menu_background" />
 
 </com.wsl.library.design.DdToolbar>

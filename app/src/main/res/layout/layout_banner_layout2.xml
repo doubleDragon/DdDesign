@@ -6,8 +6,8 @@
     android:layout_height="300dp"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    app:dd_collapseMode="@integer/parallax"
-    tools:background="#f33">
+    tools:background="#f33"
+    android:visibility="gone">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/dd_banner_viewpager"

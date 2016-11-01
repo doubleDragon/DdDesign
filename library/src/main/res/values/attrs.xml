@@ -1,20 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <attr name="overlapTop" format="dimension" />
+    <attr name="dd_overlapTop" format="dimension" />
+    <attr name="dd_consume_top_insets" format="boolean" />
+
+    <attr name="dd_collapseMode" format="integer">
+        <enum name="none" value="0" />
+        <enum name="pin" value="1" />
+        <enum name="parallax" value="2" />
+    </attr>
 
     <declare-styleable name="DdHeaderLayout">
-        <attr name="ready_offset" format="dimension" />
+        <attr name="dd_ready_offset" format="dimension" />
+        <attr name="dd_consume_top_insets" />
     </declare-styleable>
 
     <declare-styleable name="DdHeaderLayout_LayoutParams">
-        <attr name="overlapTop" />
+        <attr name="dd_overlapTop" />
 
     </declare-styleable>
 
     <declare-styleable name="DdBarLayout_LayoutParams">
 
-        <attr name="overlapTop" />
+        <attr name="dd_overlapTop" />
 
     </declare-styleable>
 
@@ -22,17 +30,24 @@
 
         <attr name="dd_contentScrim" format="reference" />
         <attr name="dd_statusBarScrim" format="reference" />
+        <attr name="dd_consume_top_insets" />
 
     </declare-styleable>
 
     <declare-styleable name="DdCollapsingBarLayout_LayoutParams">
 
-        <attr name="collapseMode" format="enum">
-            <enum name="none" value="0" />
-            <enum name="pin" value="1" />
-            <enum name="parallax" value="2" />
-        </attr>
+        <attr name="dd_collapseMode" />
 
+    </declare-styleable>
+
+    <declare-styleable name="DdSimpleBarLayout_LayoutParams">
+
+        <attr name="dd_collapseMode" />
+
+    </declare-styleable>
+
+    <declare-styleable name="DdToolbar">
+        <attr name="dd_offset_enable" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="DdToolbar_LayoutParams">
@@ -42,6 +57,13 @@
 
     <declare-styleable name="DdSecondLayout_LayoutParams">
         <attr name="dd_minimum_height" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="DdToolBarView">
+        <attr name="dd_inner_drawable" format="reference" />
+        <attr name="dd_inner_to_outer_padding" format="dimension" />
+        <attr name="dd_outer_drawable" format="reference" />
+        <attr name="dd_outer_alpha" format="integer" />
     </declare-styleable>
 
 </resources>

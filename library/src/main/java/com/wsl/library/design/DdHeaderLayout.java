@@ -44,6 +44,7 @@ public class DdHeaderLayout extends ViewGroup {
     private final List<OnOffsetChangedListener> mListeners = new ArrayList<>();
 
     private int mReadyOffset;
+    private boolean mConsumeTopInsets;
     private boolean mDebug;
 
     public DdHeaderLayout(Context context) {
@@ -62,22 +63,27 @@ public class DdHeaderLayout extends ViewGroup {
     private void init(Context context, AttributeSet attrs) {
         setWillNotDraw(true);
 
+
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.DdHeaderLayout);
+        mReadyOffset = a.getDimensionPixelSize(R.styleable.DdHeaderLayout_dd_ready_offset, 0);
+        mConsumeTopInsets = a.getBoolean(R.styleable.DdHeaderLayout_dd_consume_top_insets, true);
+        a.recycle();
+
         ViewCompat.setOnApplyWindowInsetsListener(this,
                 new android.support.v4.view.OnApplyWindowInsetsListener() {
                     @Override
                     public WindowInsetsCompat onApplyWindowInsets(View v,
                                                                   WindowInsetsCompat insets) {
+                        if (!mConsumeTopInsets) {
+                            return insets;
+                        }
                         setWindowInsets(insets);
                         return insets.consumeSystemWindowInsets();
                     }
                 });
-
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.DdHeaderLayout);
-        mReadyOffset = a.getDimensionPixelSize(R.styleable.DdHeaderLayout_ready_offset, 0);
-        a.recycle();
     }
 
-    private void setDebug(boolean debug) {
+    public void setDebug(boolean debug) {
         this.mDebug = debug;
     }
 
@@ -262,7 +268,7 @@ public class DdHeaderLayout extends ViewGroup {
         public LayoutParams(Context context, AttributeSet attrs) {
             super(context, attrs);
             TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.DdHeaderLayout_LayoutParams);
-            overlayTop = a.getDimensionPixelSize(R.styleable.DdHeaderLayout_LayoutParams_overlapTop, 0);
+            overlayTop = a.getDimensionPixelSize(R.styleable.DdHeaderLayout_LayoutParams_dd_overlapTop, 0);
             a.recycle();
         }
 
@@ -386,7 +392,7 @@ public class DdHeaderLayout extends ViewGroup {
         @Override
         public boolean onNestedPreFling(CoordinatorLayout coordinatorLayout, DdHeaderLayout child, View target, float velocityX, float velocityY) {
             int dy;
-            if(velocityY < 0) {
+            if (velocityY < 0) {
                 //We're scrolling down, need auto scroll to ready state
                 dy = -getTopBottomOffsetForScrollingSibling() - child.getBottomStableChildReadyVisibleScrollRange();
             } else {
@@ -448,6 +454,7 @@ public class DdHeaderLayout extends ViewGroup {
         /**
          * Top　or Middle 状态下滑动,根据滑动的距离决定是否回滚
          * 判断标准:滑动超过半屏幕
+         *
          * @return true 回滚
          */
         boolean isShouldSnapToOriginWhenVisible(DdHeaderLayout view) {
@@ -465,6 +472,7 @@ public class DdHeaderLayout extends ViewGroup {
         /**
          * Ready状态向上滑动,根据滑动的距离决定是否回滚
          * 判断标准:滑动超过半屏幕
+         *
          * @param view
          * @return
          */
@@ -496,7 +504,7 @@ public class DdHeaderLayout extends ViewGroup {
         }
 
         private void snapToChildIfNeeded(CoordinatorLayout coordinatorLayout, DdHeaderLayout view) {
-            if(getScrollState() == SCROLL_STATE_STABLE_CHILD_MIDDLE) {
+            if (getScrollState() == SCROLL_STATE_STABLE_CHILD_MIDDLE) {
                 int dy = -getTopBottomOffsetForScrollingSibling() - getOffsetWhenTopState(view);
                 autoScroll(coordinatorLayout, view, dy);
             }
@@ -545,7 +553,7 @@ public class DdHeaderLayout extends ViewGroup {
                     consumed = curOffset - newOffset;
                     // Update the stored sibling offset
                     mOffsetDelta = newOffset - interpolatedOffset;
-                    if(header.mDebug) {
+                    if (header.mDebug) {
                         Log.d("debug", "setHeaderTopBottomOffset " + interpolatedOffset + "---isBeingDragged(): " + isBeingDragged());
                     }
 
@@ -570,7 +578,7 @@ public class DdHeaderLayout extends ViewGroup {
                         setScrollState(SCROLL_STATE_STABLE_CHILD_INVISIBLE);
                     } else if (scrollSibling == stableChildReadyScrollRange) {
                         setScrollState(SCROLL_STATE_STABLE_CHILD_READY);
-                    } else if(scrollSibling > stableChildReadyScrollRange && scrollSibling < maxDragOffset) {
+                    } else if (scrollSibling > stableChildReadyScrollRange && scrollSibling < maxDragOffset) {
                         setScrollState(SCROLL_STATE_STABLE_CHILD_MIDDLE);
                     } else if (scrollSibling == maxDragOffset) {
                         setScrollState(SCROLL_STATE_STABLE_CHILD_TOP);

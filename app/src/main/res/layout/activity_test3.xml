@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<saulmm.coordinatorexamples.test.TestLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:fitsSystemWindows="true">
 
-    <include layout="@layout/item_project_detail_sale_rate2"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="first line code"
+        android:background="#333"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:gravity="center"
+        />
 
-</LinearLayout>
+
+</saulmm.coordinatorexamples.test.TestLayout>

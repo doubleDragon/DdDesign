@@ -10,12 +10,14 @@ import android.view.ViewParent;
 import android.widget.LinearLayout;
 
 /**
+ * Fake ToolBar, just use in DdHeaderLayout
  * Created by wsl on 16-8-30.
  */
 
 public class DdToolbar extends LinearLayout {
 
     private ViewUpdateListener mViewUpdateListener;
+    private boolean mOffsetEnable;
 
     public DdToolbar(Context context) {
         this(context, null);
@@ -27,13 +29,20 @@ public class DdToolbar extends LinearLayout {
 
     public DdToolbar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init(context, attrs);
+    }
+
+    private void init(Context context, AttributeSet attrs) {
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.DdToolbar);
+        mOffsetEnable = a.getBoolean(R.styleable.DdToolbar_dd_offset_enable, true);
+        a.recycle();
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         ViewParent parent = getParent();
-        if (parent instanceof DdCollapsingBarLayout) {
+        if (mOffsetEnable && parent instanceof DdCollapsingBarLayout) {
             if (mViewUpdateListener == null) {
                 mViewUpdateListener = new ViewUpdateListener();
             }
@@ -44,7 +53,7 @@ public class DdToolbar extends LinearLayout {
     @Override
     protected void onDetachedFromWindow() {
         final ViewParent parent = getParent();
-        if (mViewUpdateListener != null && parent instanceof DdCollapsingBarLayout) {
+        if (mOffsetEnable && mViewUpdateListener != null && parent instanceof DdCollapsingBarLayout) {
             ((DdCollapsingBarLayout) parent).removeOffsetListener(mViewUpdateListener);
         }
         super.onDetachedFromWindow();
@@ -112,19 +121,19 @@ public class DdToolbar extends LinearLayout {
             this.verticalOffset = false;
         }
 
-        public boolean isChangeAlpha() {
+        boolean isChangeAlpha() {
             return changeAlpha;
         }
 
-        public void setChangeAlpha(boolean changeAlpha) {
+        void setChangeAlpha(boolean changeAlpha) {
             this.changeAlpha = changeAlpha;
         }
 
-        public boolean isVerticalOffset() {
+        boolean isVerticalOffset() {
             return verticalOffset;
         }
 
-        public void setVerticalOffset(boolean verticalOffset) {
+        void setVerticalOffset(boolean verticalOffset) {
             this.verticalOffset = verticalOffset;
         }
     }
@@ -138,9 +147,14 @@ public class DdToolbar extends LinearLayout {
                 View child = getChildAt(i);
                 LayoutParams lp = (LayoutParams) child.getLayoutParams();
                 if (lp.isChangeAlpha()) {
-                    Drawable drawable = child.getBackground();
-                    if (drawable != null) {
-                        drawable.setAlpha(alpha);
+                    if (child instanceof DdToolBarView) {
+                        DdToolBarView toolBarView = (DdToolBarView) child;
+                        toolBarView.setOuterAlpha(alpha);
+                    } else {
+                        Drawable drawable = child.getBackground();
+                        if (drawable != null) {
+                            drawable.setAlpha(alpha);
+                        }
                     }
                 }
                 if (lp.isVerticalOffset()) {
