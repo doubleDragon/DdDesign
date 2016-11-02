@@ -63,23 +63,22 @@ public class DdToolBarView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        resizeInnerRect();
-        resizeOuterRect();
+        resizeRect();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        if (mInnerDrawable != null && mInnerRect != null) {
-            mInnerDrawable.setBounds(mInnerRect);
-            mInnerDrawable.draw(canvas);
-        }
-
-        if (mOuterDrawable != null && mOuterRect != null) {
+        if (mOuterDrawable != null && mOuterRect != null && outerRectValid()) {
             mOuterDrawable.setBounds(mOuterRect);
             mOuterDrawable.mutate().setAlpha(mOuterAlpha);
             mOuterDrawable.draw(canvas);
+        }
+
+        if (mInnerDrawable != null && mInnerRect != null && innerRectValid()) {
+            mInnerDrawable.setBounds(mInnerRect);
+            mInnerDrawable.draw(canvas);
         }
     }
 
@@ -90,7 +89,7 @@ public class DdToolBarView extends View {
             }
             if (drawable != null) {
                 mInnerDrawable = drawable.mutate();
-                resizeInnerRect();
+                resizeRect();
                 drawable.setBounds(mInnerRect);
                 drawable.setCallback(this);
             } else {
@@ -107,7 +106,7 @@ public class DdToolBarView extends View {
             }
             if (drawable != null) {
                 mOuterDrawable = drawable.mutate();
-                resizeOuterRect();
+                resizeRect();
                 drawable.setBounds(mOuterRect);
                 drawable.setCallback(this);
                 drawable.setAlpha(mOuterAlpha);
@@ -118,26 +117,40 @@ public class DdToolBarView extends View {
         }
     }
 
-    private void resizeInnerRect() {
+    private void resizeRect() {
+        if(mInnerDrawable == null) {
+            return;
+        }
         int left = (getWidth() - mInnerDrawable.getIntrinsicWidth()) / 2;
         int top = (getHeight() - mInnerDrawable.getIntrinsicHeight()) / 2;
         int right = (getWidth() + mInnerDrawable.getIntrinsicWidth()) / 2;
         int bottom = (getHeight() + mInnerDrawable.getIntrinsicHeight()) / 2;
         mInnerRect.set(left, top, right, bottom);
+
+        mOuterRect.left = left - mInnerToOutPadding;
+        mOuterRect.right = right + mInnerToOutPadding;
+        mOuterRect.top = top - mInnerToOutPadding;
+        mOuterRect.bottom = bottom + mInnerToOutPadding;
     }
 
-    private void resizeOuterRect() {
-        if (mInnerRect != null) {
-            mOuterRect.left = mInnerRect.left - mInnerToOutPadding;
-            mOuterRect.right = mInnerRect.right + mInnerToOutPadding;
-            mOuterRect.top = mInnerRect.top - mInnerToOutPadding;
-            mOuterRect.bottom = mInnerRect.bottom + mInnerToOutPadding;
-        } else {
-            mOuterRect.left = 0;
-            mOuterRect.top = 0;
-            mOuterRect.right = getWidth();
-            mOuterRect.bottom = getHeight();
-        }
+    /**
+     * inner Rect的边界都不为0
+     */
+    private boolean innerRectValid() {
+        return mInnerRect.left != 0 &&
+                mInnerRect.top != 0 &&
+                mInnerRect.right != 0 &&
+                mInnerRect.bottom != 0;
+    }
+
+    /**
+     * inner Rect的边界都不为0
+     */
+    private boolean outerRectValid() {
+        return mOuterRect.left != 0 &&
+                mOuterRect.top != 0 &&
+                mOuterRect.right != 0 &&
+                mOuterRect.bottom != 0;
     }
 
     public void setOuterAlpha(int alpha) {

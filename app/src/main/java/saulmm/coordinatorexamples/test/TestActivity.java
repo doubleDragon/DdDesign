@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -17,6 +18,7 @@ import com.wsl.library.banner.DdBannerIndicator;
 import com.wsl.library.design.DdBarLayout;
 import com.wsl.library.design.DdCollapsingBarLayout;
 import com.wsl.library.design.DdHeaderLayout;
+import com.wsl.library.design.DdToolBarView;
 import com.zhy.view.flowlayout.FlowLayout;
 import com.zhy.view.flowlayout.TagAdapter;
 import com.zhy.view.flowlayout.TagFlowLayout;
@@ -77,6 +79,9 @@ public class TestActivity extends AppCompatActivity {
         Log.d("test", "click menu");
     }
 
+    @BindView(R.id.iv_menu)
+    DdToolBarView ivMenu;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,6 +137,7 @@ public class TestActivity extends AppCompatActivity {
         rvContent.postDelayed(new Runnable() {
             @Override
             public void run() {
+                ivMenu.setInnerDrawable(ContextCompat.getDrawable(TestActivity.this, R.drawable.ic_menu_manager));
             }
         }, 2000);
     }

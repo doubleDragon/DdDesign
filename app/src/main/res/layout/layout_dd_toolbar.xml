@@ -33,12 +33,12 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         app:dd_vertical_offset="true" />
 
+    <!--app:dd_inner_drawable="@drawable/ic_menu_manager"-->
     <com.wsl.library.design.DdToolBarView
         android:id="@+id/iv_menu"
         android:layout_width="70dp"
         android:layout_height="match_parent"
         app:dd_change_alpha="true"
-        app:dd_inner_drawable="@drawable/ic_menu_manager"
         app:dd_outer_drawable="@drawable/ic_menu_background"
         app:dd_inner_to_outer_padding="2dp"
         app:dd_outer_alpha="0"
