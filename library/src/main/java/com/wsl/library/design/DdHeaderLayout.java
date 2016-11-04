@@ -43,6 +43,7 @@ public class DdHeaderLayout extends ViewGroup {
 
     private final List<OnOffsetChangedListener> mListeners = new ArrayList<>();
 
+    private int mTopInsetHeight;
     private int mReadyOffset;
     private boolean mConsumeTopInsets;
     private boolean mDebug;
@@ -74,6 +75,7 @@ public class DdHeaderLayout extends ViewGroup {
                     @Override
                     public WindowInsetsCompat onApplyWindowInsets(View v,
                                                                   WindowInsetsCompat insets) {
+                        mTopInsetHeight = insets != null ? insets.getSystemWindowInsetTop() : 0;
                         if (!mConsumeTopInsets) {
                             return insets;
                         }
@@ -229,6 +231,9 @@ public class DdHeaderLayout extends ViewGroup {
         }
         int range = 0;
         int overTotalHeight = getHeight() - DdUtil.getScreenHeight(getContext());
+        if(!mConsumeTopInsets) {
+            overTotalHeight += mTopInsetHeight;
+        }
         int count = getChildCount();
         for (int i = count - 1; i >= 0; i--) {
             final View child = getChildAt(i);
