@@ -6,13 +6,16 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
+    <!--app:dd_ready_enabled="false"-->
     <com.wsl.library.design.DdHeaderLayout
         android:id="@+id/bar_parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
         app:dd_consume_top_insets="true"
-        app:dd_ready_offset="50dp">
+        app:dd_ready_offset="50dp"
+        app:dd_ready_enabled="false"
+        >
 
         <com.wsl.library.design.DdCollapsingBarLayout
             android:id="@+id/cb_bar"

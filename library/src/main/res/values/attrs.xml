@@ -11,8 +11,12 @@
     </attr>
 
     <declare-styleable name="DdHeaderLayout">
+        <!--ready状态滑动偏移量,normal状态下计算完成的距离需要加上这个偏移-->
         <attr name="dd_ready_offset" format="dimension" />
+        <!--是否消耗topInsets-->
         <attr name="dd_consume_top_insets" />
+        <!--是否需要回弹效果-->
+        <attr name="dd_ready_enabled" format="boolean"/>
     </declare-styleable>
 
     <declare-styleable name="DdHeaderLayout_LayoutParams">

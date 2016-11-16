@@ -48,7 +48,7 @@ abstract class DdHeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
     private Runnable mFlingRunnable;
     private Runnable mAutoScrollRunnable;
     private ScrollerCompat mScroller;
-    private OverScroller mAutoScroller;
+    private ScrollerCompat mAutoScroller;
 
     private boolean mIsBeingDragged;
     private int mActivePointerId = INVALID_POINTER;
@@ -184,38 +184,43 @@ abstract class DdHeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
                     float yvel = VelocityTrackerCompat.getYVelocity(mVelocityTracker,
                             mActivePointerId);
 
-                    boolean needAutoScroll = false;
-                    switch (mScrollState) {
-                        case SCROLL_STATE_STABLE_CHILD_INVISIBLE:
-                            fling(parent, child, -getOffsetWhenReadyState(child), 0, yvel);
-                            break;
-                        case SCROLL_STATE_STABLE_CHILD_READY:
-                            if(!isScrollUpWhenReady(child)) {
+                    if(!isReadyEnabled(child)) {
+                        // 回弹效果关闭, 直接fling
+                        fling(parent, child, -getScrollRangeForDragFling(child), 0, yvel);
+                    } else {
+                        boolean needAutoScroll = false;
+                        switch (mScrollState) {
+                            case SCROLL_STATE_STABLE_CHILD_INVISIBLE:
                                 fling(parent, child, -getOffsetWhenReadyState(child), 0, yvel);
-                            } else {
+                                break;
+                            case SCROLL_STATE_STABLE_CHILD_READY:
+                                if (!isScrollUpWhenReady(child)) {
+                                    fling(parent, child, -getOffsetWhenReadyState(child), 0, yvel);
+                                } else {
+                                    needAutoScroll = true;
+                                }
+                                break;
+                            case SCROLL_STATE_STABLE_CHILD_MIDDLE:
                                 needAutoScroll = true;
-                            }
-                            break;
-                        case SCROLL_STATE_STABLE_CHILD_MIDDLE:
-                            needAutoScroll = true;
-                            break;
-                        case SCROLL_STATE_STABLE_CHILD_TOP:
-                            if(!isScrollUpWhenTop(child)) {
-                                //visible状态下向下滑动时auto scroll
-                                needAutoScroll = true;
-                            }
-                            break;
-                    }
-                    if(needAutoScroll) {
-                        int dy;
-                        if(yvel > 0) {
-                            //We're scrolling down, need auto scroll to ready state
-                            dy = -getTopBottomOffsetForScrollingSibling() - getOffsetWhenReadyState(child);
-                        } else {
-                            //We're scrolling up, need auto scroll to top state
-                            dy = -getTopBottomOffsetForScrollingSibling() - getOffsetWhenTopState(child);
+                                break;
+                            case SCROLL_STATE_STABLE_CHILD_TOP:
+                                if (!isScrollUpWhenTop(child)) {
+                                    //visible状态下向下滑动时auto scroll
+                                    needAutoScroll = true;
+                                }
+                                break;
                         }
-                        autoScroll(parent, child, dy);
+                        if (needAutoScroll) {
+                            int dy;
+                            if (yvel > 0) {
+                                //We're scrolling down, need auto scroll to ready state
+                                dy = -getTopBottomOffsetForScrollingSibling() - getOffsetWhenReadyState(child);
+                            } else {
+                                //We're scrolling up, need auto scroll to top state
+                                dy = -getTopBottomOffsetForScrollingSibling() - getOffsetWhenTopState(child);
+                            }
+                            autoScroll(parent, child, dy);
+                        }
                     }
                 }
                 // $FALLTHROUGH
@@ -240,6 +245,11 @@ abstract class DdHeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
 
     boolean isBeingDragged() {
         return mIsBeingDragged;
+    }
+
+    boolean isReadyEnabled(V view) {
+        //默认开启回弹效果
+        return true;
     }
 
     boolean isScrollUpWhenReady(V view) {
@@ -315,7 +325,7 @@ abstract class DdHeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
         }
 
         if (mAutoScroller == null) {
-            mAutoScroller = new OverScroller(layout.getContext());
+            mAutoScroller = ScrollerCompat.create(layout.getContext());
         }
         mAutoScroller.startScroll(0, getTopAndBottomOffset(), 0, dy, duration);
         if (mAutoScroller.computeScrollOffset()) {
@@ -333,7 +343,17 @@ abstract class DdHeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
         }
         if(mAutoScroller != null) {
             if(!mAutoScroller.isFinished()) {
-                mAutoScroller.forceFinished(true);
+//                mAutoScroller.forceFinished(true);
+                mAutoScroller.abortAnimation();
+            }
+        }
+        if (mFlingRunnable != null) {
+            layout.removeCallbacks(mFlingRunnable);
+            mFlingRunnable = null;
+        }
+        if(mScroller != null) {
+            if(mScroller.isFinished()) {
+                mScroller.abortAnimation();
             }
         }
     }
@@ -355,7 +375,9 @@ abstract class DdHeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
                 0, 0, // x
                 minOffset, maxOffset); // y
 
+
         if (mScroller.computeScrollOffset()) {
+            Log.d("test", "fling mFinalY: " + mScroller.getFinalY() + "---currY: " + mScroller.getCurrY() + "---min: " + minOffset + "---max: " + maxOffset);
             mFlingRunnable = new DdHeaderBehavior.FlingRunnable(coordinatorLayout, layout);
             ViewCompat.postOnAnimation(layout, mFlingRunnable);
             return true;
@@ -375,6 +397,10 @@ abstract class DdHeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
      */
     int getMaxDragOffset(V view) {
         return -view.getHeight();
+    }
+
+    int getScrollRangeForDragFling(V view) {
+        return view.getHeight();
     }
 
     private void ensureVelocityTracker() {

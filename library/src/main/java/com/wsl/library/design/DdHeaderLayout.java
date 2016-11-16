@@ -45,6 +45,7 @@ public class DdHeaderLayout extends ViewGroup {
 
     private int mTopInsetHeight;
     private int mReadyOffset;
+    private boolean mReadyEnabled;
     private boolean mConsumeTopInsets;
     private boolean mDebug;
 
@@ -68,6 +69,7 @@ public class DdHeaderLayout extends ViewGroup {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.DdHeaderLayout);
         mReadyOffset = a.getDimensionPixelSize(R.styleable.DdHeaderLayout_dd_ready_offset, 0);
         mConsumeTopInsets = a.getBoolean(R.styleable.DdHeaderLayout_dd_consume_top_insets, true);
+        mReadyEnabled = a.getBoolean(R.styleable.DdHeaderLayout_dd_ready_enabled, true);
         a.recycle();
 
         ViewCompat.setOnApplyWindowInsetsListener(this,
@@ -194,6 +196,10 @@ public class DdHeaderLayout extends ViewGroup {
                 break;
             }
         }
+    }
+
+    private boolean isReadyEnabled() {
+        return mReadyEnabled;
     }
 
     private int getTopInset() {
@@ -381,7 +387,7 @@ public class DdHeaderLayout extends ViewGroup {
         @Override
         public void onStopNestedScroll(CoordinatorLayout coordinatorLayout, DdHeaderLayout abl,
                                        View target) {
-            if (!mWasFlung) {
+            if (!mWasFlung && abl.isReadyEnabled()) {
                 // If we haven't been flung then let's see if the current view has been set to snap
                 // onNestedPreFling　don't invoke, so trigger to top state
                 snapToChildIfNeeded(coordinatorLayout, abl);
@@ -396,17 +402,41 @@ public class DdHeaderLayout extends ViewGroup {
 
         @Override
         public boolean onNestedPreFling(CoordinatorLayout coordinatorLayout, DdHeaderLayout child, View target, float velocityX, float velocityY) {
+            if(!child.isReadyEnabled()) {
+                //如果不需要回弹效果
+                if(velocityY < 0) {
+                    //手指向下, 被依赖的DdHeaderLayout拦截fling效果,依赖的View不处理
+                    fling(coordinatorLayout, child, getTopBottomOffsetForScrollingSibling(), 0, -velocityY);
+                    mWasFlung = true;
+                    return true;
+                } else {
+                    //手指向上,
+                    // DdHeaderLayout如果没达到最大滑动距离,fling部分距离到最大滑动位置
+                    // 如果还剩余fling距离，交给依赖View处理fling
+                    if(child.getTotalScrollRange() == -getTopBottomOffsetForScrollingSibling()) {
+                        return false;
+                    }
+                    fling(coordinatorLayout, child, -getScrollRangeForDragFling(child), 0, -velocityY);
+                    mWasFlung = true;
+                    return true;
+                }
+            }
             int dy;
             if (velocityY < 0) {
-                //We're scrolling down, need auto scroll to ready state
+                //(手指向下)We're scrolling down, need auto scroll to ready state
                 dy = -getTopBottomOffsetForScrollingSibling() - child.getBottomStableChildReadyVisibleScrollRange();
             } else {
-                //We're scrolling up, need auto scroll to top state
+                //(手指向上)We're scrolling up, need auto scroll to top state
                 dy = -getTopBottomOffsetForScrollingSibling() - child.getTotalScrollRange();
             }
             autoScroll(coordinatorLayout, child, dy);
             mWasFlung = true;
             return true;
+        }
+
+        @Override
+        boolean isReadyEnabled(DdHeaderLayout view) {
+            return view.isReadyEnabled();
         }
 
         /**
@@ -417,10 +447,15 @@ public class DdHeaderLayout extends ViewGroup {
          */
         @Override
         int getMaxDragOffset(DdHeaderLayout view) {
-            if (getScrollState() == SCROLL_STATE_STABLE_CHILD_INVISIBLE) {
+            if (view.isReadyEnabled() && getScrollState() == SCROLL_STATE_STABLE_CHILD_INVISIBLE) {
                 return -view.getBottomStableChildReadyVisibleScrollRange();
             }
             return -view.getTotalScrollRange();
+        }
+
+        @Override
+        int getScrollRangeForDragFling(DdHeaderLayout view) {
+            return view.getTotalScrollRange();
         }
 
         @Override
@@ -575,7 +610,7 @@ public class DdHeaderLayout extends ViewGroup {
                 }
 
                 //reset scroll state after dragged
-                if (!isBeingDragged()) {
+                if (ddBarLayout.isReadyEnabled() && !isBeingDragged()) {
                     int scrollSibling = -getTopBottomOffsetForScrollingSibling();
                     int stableChildReadyScrollRange = header.getBottomStableChildReadyVisibleScrollRange();
                     int maxDragOffset = -getMaxDragOffset(header);
