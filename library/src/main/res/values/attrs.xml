@@ -41,6 +41,7 @@
     <declare-styleable name="DdCollapsingBarLayout_LayoutParams">
 
         <attr name="dd_collapseMode" />
+        <attr name="dd_overlapTop" />
 
     </declare-styleable>
 

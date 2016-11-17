@@ -377,7 +377,6 @@ abstract class DdHeaderBehavior<V extends View> extends ViewOffsetBehavior<V> {
 
 
         if (mScroller.computeScrollOffset()) {
-            Log.d("test", "fling mFinalY: " + mScroller.getFinalY() + "---currY: " + mScroller.getCurrY() + "---min: " + minOffset + "---max: " + maxOffset);
             mFlingRunnable = new DdHeaderBehavior.FlingRunnable(coordinatorLayout, layout);
             ViewCompat.postOnAnimation(layout, mFlingRunnable);
             return true;

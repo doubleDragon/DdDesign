@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.WindowInsetsCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -163,11 +164,10 @@ public class DdCollapsingBarLayout extends ViewGroup {
                 case LayoutParams.COLLAPSE_MODE_PARALLAX:
                     //view index 0 or 1
                     maxHeight = Math.max(maxHeight, childHeight + lp.topMargin + lp.bottomMargin);
-
                     break;
                 case LayoutParams.COLLAPSE_MODE_OFF:
                     //view index 2
-                    maxHeight += childHeight + lp.topMargin + lp.bottomMargin;
+                    maxHeight += childHeight + lp.topMargin + lp.bottomMargin - lp.overlapTop;
                     break;
             }
             childState = combineMeasuredStates(childState, child.getMeasuredState());
@@ -218,7 +218,7 @@ public class DdCollapsingBarLayout extends ViewGroup {
                     break;
                 case LayoutParams.COLLAPSE_MODE_OFF:
                 default:
-                    top = parallaxBottom + lp.topMargin;
+                    top = parallaxBottom + lp.topMargin - lp.overlapTop;
                     bottom = top + childHeight;
                     break;
             }
@@ -461,12 +461,14 @@ public class DdCollapsingBarLayout extends ViewGroup {
         public static final int COLLAPSE_MODE_PARALLAX = 2;
 
         private int collapseMode;
+        private int overlapTop;
         float mParallaxMult = DEFAULT_PARALLAX_MULTIPLIER;
 
         public LayoutParams(Context context, AttributeSet attrs) {
             super(context, attrs);
             TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.DdCollapsingBarLayout_LayoutParams);
             collapseMode = a.getInt(R.styleable.DdCollapsingBarLayout_LayoutParams_dd_collapseMode, COLLAPSE_MODE_OFF);
+            overlapTop = a.getDimensionPixelSize(R.styleable.DdCollapsingBarLayout_LayoutParams_dd_overlapTop, 0);
             a.recycle();
         }
 
