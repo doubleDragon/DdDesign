@@ -137,9 +137,10 @@ public class TestActivity extends AppCompatActivity {
         rvContent.postDelayed(new Runnable() {
             @Override
             public void run() {
-                ivMenu.setInnerDrawable(ContextCompat.getDrawable(TestActivity.this, R.drawable.ic_menu_manager));
+//                ivMenu.setInnerDrawable(ContextCompat.getDrawable(TestActivity.this, R.drawable.ic_menu_manager));
+                ivMenu.setCircleAlpha(0);
             }
-        }, 2000);
+        }, 5000);
     }
 
     private List<String> getDelayData() {

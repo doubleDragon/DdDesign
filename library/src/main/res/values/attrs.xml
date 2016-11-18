@@ -69,6 +69,9 @@
         <attr name="dd_inner_to_outer_padding" format="dimension" />
         <attr name="dd_outer_drawable" format="reference" />
         <attr name="dd_outer_alpha" format="integer" />
+        <attr name="dd_circle_color" format="color"/>
+        <attr name="dd_circle_radius" format="dimension"/>
+        <attr name="dd_circle_alpha" format="integer"/>
     </declare-styleable>
 
 </resources>

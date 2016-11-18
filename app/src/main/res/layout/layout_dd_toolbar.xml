@@ -6,9 +6,9 @@
     android:layout_height="?attr/actionBarSize"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    app:dd_offset_enable="true"
     app:dd_collapseMode="@integer/pin"
-    tools:background="#f00">
+    app:dd_offset_enable="true"
+    tools:background="#333">
 
     <com.wsl.library.design.DdToolBarView
         android:id="@+id/iv_home"
@@ -16,9 +16,9 @@
         android:layout_height="match_parent"
         app:dd_change_alpha="true"
         app:dd_inner_drawable="@drawable/ic_home"
-        app:dd_outer_drawable="@drawable/ic_home_background"
         app:dd_inner_to_outer_padding="5dp"
-        app:dd_outer_alpha="0"/>
+        app:dd_outer_alpha="0"
+        app:dd_outer_drawable="@drawable/ic_home_background3" />
 
     <TextView
         android:id="@+id/tv_title"
@@ -33,15 +33,18 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         app:dd_vertical_offset="true" />
 
-    <!--app:dd_inner_drawable="@drawable/ic_menu_manager"-->
+
     <com.wsl.library.design.DdToolBarView
         android:id="@+id/iv_menu"
         android:layout_width="70dp"
         android:layout_height="match_parent"
         app:dd_change_alpha="true"
-        app:dd_outer_drawable="@drawable/ic_menu_background"
-        app:dd_inner_to_outer_padding="2dp"
+        app:dd_inner_drawable="@drawable/ic_menu_manager"
+        app:dd_inner_to_outer_padding="8dp"
         app:dd_outer_alpha="0"
-        />
+        app:dd_outer_drawable="@drawable/ic_menu_background"
+        app:dd_circle_color="#f25b4b"
+        app:dd_circle_radius="2.5dp"
+        app:dd_circle_alpha="255"/>
 
 </com.wsl.library.design.DdToolbar>

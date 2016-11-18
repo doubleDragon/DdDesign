@@ -3,11 +3,13 @@ package com.wsl.library.design;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 
@@ -17,6 +19,14 @@ import android.view.View;
  */
 
 public class DdToolBarView extends View {
+
+    //circle
+    private int mCircleColor;
+    private int mCircleRadius;
+    private int mCircleAlpha;
+    private float mCircleCx;
+    private float mCircleCy;
+    private Paint mCirclePaint;
 
     private Drawable mInnerDrawable;
     private Drawable mOuterDrawable;
@@ -52,7 +62,18 @@ public class DdToolBarView extends View {
                 context.getResources().getDisplayMetrics());
         mInnerToOutPadding = a.getDimensionPixelSize(R.styleable.DdToolBarView_dd_inner_to_outer_padding, defaultPadding);
         mOuterAlpha = a.getInt(R.styleable.DdToolBarView_dd_outer_alpha, 0);
+
+        mCircleColor = a.getColor(R.styleable.DdToolBarView_dd_circle_color, 0xf25b4b);
+        mCircleRadius = a.getDimensionPixelOffset(R.styleable.DdToolBarView_dd_circle_radius, 0);
+        mCircleAlpha = a.getInt(R.styleable.DdToolBarView_dd_circle_alpha, 0);
         a.recycle();
+
+        //init circle
+        mCirclePaint = new Paint();
+        mCirclePaint.setAntiAlias(true);
+        mCirclePaint.setDither(true);
+        mCirclePaint.setAlpha(mCircleAlpha);
+        mCirclePaint.setColor(mCircleColor);
     }
 
     @Override
@@ -80,6 +101,14 @@ public class DdToolBarView extends View {
             mInnerDrawable.setBounds(mInnerRect);
             mInnerDrawable.draw(canvas);
         }
+
+        //draw red point
+        drawCircle(canvas);
+    }
+
+    private void drawCircle(Canvas canvas) {
+        mCirclePaint.setAlpha(mCircleAlpha);
+        canvas.drawCircle(mCircleCx, mCircleCy, mCircleRadius, mCirclePaint);
     }
 
     public void setInnerDrawable(@Nullable Drawable drawable) {
@@ -118,7 +147,7 @@ public class DdToolBarView extends View {
     }
 
     private void resizeRect() {
-        if(mInnerDrawable == null) {
+        if (mInnerDrawable == null) {
             return;
         }
         int left = (getWidth() - mInnerDrawable.getIntrinsicWidth()) / 2;
@@ -131,6 +160,10 @@ public class DdToolBarView extends View {
         mOuterRect.right = right + mInnerToOutPadding;
         mOuterRect.top = top - mInnerToOutPadding;
         mOuterRect.bottom = bottom + mInnerToOutPadding;
+
+        //circle
+        mCircleCx = right;
+        mCircleCy = top;
     }
 
     /**
@@ -156,5 +189,16 @@ public class DdToolBarView extends View {
     public void setOuterAlpha(int alpha) {
         mOuterAlpha = alpha;
         ViewCompat.postInvalidateOnAnimation(this);
+    }
+
+    /**
+     * 0~255
+     */
+    public void setCircleAlpha(int alpha) {
+        if(alpha == mCircleAlpha) {
+            return;
+        }
+        mCircleAlpha = alpha;
+        invalidate();
     }
 }
