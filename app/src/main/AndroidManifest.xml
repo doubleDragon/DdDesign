@@ -11,7 +11,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".test.TestActivity"
+            android:name=".test.TestActivity4"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.TestTheme">
             <intent-filter>

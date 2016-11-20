@@ -103,14 +103,14 @@ public class DdHeaderLayout extends ViewGroup {
         }
     }
 
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-        int count = getChildCount();
-        if (count != 2) {
-            throw new IllegalArgumentException("must exists two child view");
-        }
-    }
+//    @Override
+//    protected void onFinishInflate() {
+//        super.onFinishInflate();
+//        int count = getChildCount();
+//        if (count != 2) {
+//            throw new IllegalArgumentException("must exists two child view");
+//        }
+//    }
 
     private void invalidateScrollRanges() {
         mTotalScrollRange = INVALID_SCROLL_RANGE;

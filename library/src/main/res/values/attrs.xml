@@ -74,4 +74,8 @@
         <attr name="dd_circle_alpha" format="integer"/>
     </declare-styleable>
 
+    <declare-styleable name="DdDependency">
+        <attr name="target" format="reference"/>
+    </declare-styleable>
+
 </resources>
