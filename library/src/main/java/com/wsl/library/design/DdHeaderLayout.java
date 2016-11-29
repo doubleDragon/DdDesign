@@ -402,7 +402,7 @@ public class DdHeaderLayout extends ViewGroup {
         @Override
         public void onStopNestedScroll(CoordinatorLayout coordinatorLayout, DdHeaderLayout abl,
                                        View target) {
-            if (!mWasFlung && abl.isReadyEnabled()) {
+            if (!mWasFlung && abl.isReadyEnabled() && !abl.isUpEnabled()) {
                 // If we haven't been flung then let's see if the current view has been set to snap
                 // onNestedPreFling　don't invoke, so trigger to top state
                 snapToChildIfNeeded(coordinatorLayout, abl);
@@ -420,6 +420,10 @@ public class DdHeaderLayout extends ViewGroup {
             if(!child.isReadyEnabled()) {
                 //如果不需要回弹效果
                 if(velocityY < 0) {
+                    if(child.isUpEnabled()) {
+                        mWasFlung = false;
+                        return false;
+                    }
                     //手指向下, 被依赖的DdHeaderLayout拦截fling效果,依赖的View不处理
                     fling(coordinatorLayout, child, getTopBottomOffsetForScrollingSibling(), 0, -velocityY);
                     mWasFlung = true;
@@ -447,6 +451,25 @@ public class DdHeaderLayout extends ViewGroup {
             autoScroll(coordinatorLayout, child, dy);
             mWasFlung = true;
             return true;
+        }
+
+        @Override
+        public boolean onNestedFling(CoordinatorLayout coordinatorLayout, DdHeaderLayout child, View target, float velocityX, float velocityY, boolean consumed) {
+            boolean flung = false;
+
+            if (!consumed) {
+                // It has been consumed so let's fling ourselves
+                flung = fling(coordinatorLayout, child, -child.getTotalScrollRange(),
+                        0, -velocityY);
+            } else {
+                if(velocityY < 0) {
+                    //向上滑动过程中如果target已经消耗过fling了,则fake向上fling
+                    flung = fling(coordinatorLayout, child, -child.getTotalScrollRange(),
+                            0, -velocityY);
+                }
+            }
+            mWasFlung = flung;
+            return flung;
         }
 
         @Override
