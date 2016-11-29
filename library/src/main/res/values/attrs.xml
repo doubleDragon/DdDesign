@@ -17,6 +17,8 @@
         <attr name="dd_consume_top_insets" />
         <!--是否需要回弹效果-->
         <attr name="dd_ready_enabled" format="boolean"/>
+        <!--是否让child优先处理上滑,onPreNested直接返回-->
+        <attr name="dd_up_enabled" format="boolean"/>
     </declare-styleable>
 
     <declare-styleable name="DdHeaderLayout_LayoutParams">

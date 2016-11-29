@@ -15,6 +15,7 @@
         app:dd_consume_top_insets="true"
         app:dd_ready_offset="50dp"
         app:dd_ready_enabled="false"
+        app:dd_up_enabled="true"
         >
 
         <com.wsl.library.design.DdCollapsingBarLayout

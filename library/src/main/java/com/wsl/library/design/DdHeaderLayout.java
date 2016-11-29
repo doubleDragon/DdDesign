@@ -46,6 +46,7 @@ public class DdHeaderLayout extends ViewGroup {
     private int mTopInsetHeight;
     private int mReadyOffset;
     private boolean mReadyEnabled;
+    private boolean mUpEnabled;
     private boolean mConsumeTopInsets;
     private boolean mDebug;
 
@@ -70,6 +71,7 @@ public class DdHeaderLayout extends ViewGroup {
         mReadyOffset = a.getDimensionPixelSize(R.styleable.DdHeaderLayout_dd_ready_offset, 0);
         mConsumeTopInsets = a.getBoolean(R.styleable.DdHeaderLayout_dd_consume_top_insets, true);
         mReadyEnabled = a.getBoolean(R.styleable.DdHeaderLayout_dd_ready_enabled, true);
+        mUpEnabled = a.getBoolean(R.styleable.DdHeaderLayout_dd_up_enabled, false);
         a.recycle();
 
         ViewCompat.setOnApplyWindowInsetsListener(this,
@@ -91,6 +93,10 @@ public class DdHeaderLayout extends ViewGroup {
         this.mDebug = debug;
     }
 
+    private boolean isUpEnabled() {
+        return mUpEnabled;
+    }
+
     public void addOnOffsetChangedListener(DdHeaderLayout.OnOffsetChangedListener listener) {
         if (listener != null && !mListeners.contains(listener)) {
             mListeners.add(listener);
@@ -103,14 +109,14 @@ public class DdHeaderLayout extends ViewGroup {
         }
     }
 
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-        int count = getChildCount();
-        if (count != 2) {
-            throw new IllegalArgumentException("must exists two child view");
-        }
-    }
+//    @Override
+//    protected void onFinishInflate() {
+//        super.onFinishInflate();
+//        int count = getChildCount();
+//        if (count != 2) {
+//            throw new IllegalArgumentException("must exists two child view");
+//        }
+//    }
 
     private void invalidateScrollRanges() {
         mTotalScrollRange = INVALID_SCROLL_RANGE;
@@ -335,13 +341,18 @@ public class DdHeaderLayout extends ViewGroup {
         public boolean onStartNestedScroll(CoordinatorLayout parent, DdHeaderLayout child, View directTargetChild, View target, int nestedScrollAxes) {
             // just started nested scroll when target first item display totally
             boolean canScrollDown = !ViewCompat.canScrollVertically(target, -1);
+            boolean condition = true;
+            if(!child.isUpEnabled()) {
+                //dd_up_enabled = false, target可以向下滚动时才形成嵌套滑动
+                condition = canScrollDown;
+            }
 
             // Return true if we're nested scrolling vertically, and we have scrollable children
             // and the scrolling view is big enough to scroll
             final boolean started = (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0
                     && child.hasScrollableChildren()
                     && parent.getHeight() - directTargetChild.getHeight() <= child.getHeight()
-                    && canScrollDown;
+                    && condition;
 
             if (started && mAnimator != null) {
                 // Cancel any offset animation
@@ -359,6 +370,10 @@ public class DdHeaderLayout extends ViewGroup {
         @Override
         public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, DdHeaderLayout child,
                                       View target, int dx, int dy, int[] consumed) {
+            if(child.isUpEnabled() && dy < 0) {
+                //dd_up_enabled = true, child优先处理上滑, 这里直接返回
+                return;
+            }
             if (dy != 0 && !mSkipNestedPreScroll) {
                 int min, max;
                 min = -child.getTotalScrollRange();
