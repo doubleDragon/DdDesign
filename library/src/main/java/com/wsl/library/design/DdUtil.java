@@ -3,6 +3,7 @@ package com.wsl.library.design;
 import android.content.Context;
 import android.graphics.Point;
 import android.util.Log;
+import android.util.StringBuilderPrinter;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
@@ -37,5 +38,13 @@ public class DdUtil {
         Point size = new Point();
         display.getSize(size);
         return size.y;
+    }
+
+    public static String dumpArray(int[] array) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        sb.append(array[0]).append(",").append(array[1]);
+        sb.append("]");
+        return sb.toString();
     }
 }
