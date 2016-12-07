@@ -646,21 +646,19 @@ public class DdHomeLayout extends LinearLayout{
         @Override
         public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, DdHomeLayout child,
                                       View target, int dx, int dy, int[] consumed) {
-            Log.d("nest", "onNestedPreScroll dy: " + dy + "---consumed: " + DdUtil.dumpArray(consumed));
             if (dy != 0 && !mSkipNestedPreScroll) {
                 int min, max;
                 if (dy < 0) {
                     // We're scrolling down
                     min = -child.getTotalScrollRange();
-                    max = min + child.getDownNestedPreScrollRange();
+//                    max = min + child.getDownNestedPreScrollRange();
+                    max = 0;
                 } else {
                     // We're scrolling up
                     min = -child.getUpNestedPreScrollRange();
                     max = 0;
                 }
-                Log.d("nest", "onNestedPreScroll begin pre scroll"+ "---consumed: " + DdUtil.dumpArray(consumed));
                 consumed[1] = scroll(coordinatorLayout, child, dy, min, max);
-                Log.d("nest", "onNestedPreScroll end pre scroll"+ "---consumed: " + DdUtil.dumpArray(consumed));
             }
         }
 
