@@ -11,9 +11,9 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".test.TestActivity"
+            android:name=".test.TestMainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.TestTheme">
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -54,6 +54,15 @@
         <activity android:name=".SwipeBehaviorExampleActivity" />
 
         <activity android:name=".BehaviorExample"></activity>
+
+        <activity android:name=".test.TestActivity4"
+            android:theme="@style/AppTheme.TestTheme"
+            />
+
+        <activity android:name=".test.TestActivity5"
+            android:theme="@style/AppTheme.TestTheme"
+            />
+
     </application>
 
 </manifest>

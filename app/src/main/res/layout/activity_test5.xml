@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cl_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    app:statusBarBackground="@null">
+
+    <saulmm.coordinatorexamples.test.TestLayout4
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/about" />
+
+    </saulmm.coordinatorexamples.test.TestLayout4>
+
+</android.support.design.widget.CoordinatorLayout>
+
+    <!--<saulmm.coordinatorexamples.test.TestLayout4 xmlns:android="http://schemas.android.com/apk/res/android"--><!--android:layout_width="match_parent"--><!--android:layout_height="match_parent">-->
+
+    <!--<TextView--><!--android:layout_width="match_parent"--><!--android:layout_height="wrap_content"--><!--android:text="@string/about" />-->
+
+    <!--</saulmm.coordinatorexamples.test.TestLayout4>-->

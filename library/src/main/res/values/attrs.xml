@@ -10,6 +10,20 @@
         <enum name="parallax" value="2" />
     </attr>
 
+    <declare-styleable name="DdHomeLayout">
+
+        <attr name="dd_elevation" format="dimension"/>
+        <attr name="dd_android_background" format="reference"/>
+        <attr name="dd_expanded" format="boolean"/>
+
+    </declare-styleable>
+
+    <declare-styleable name="DdHomeLayout_LayoutParams">
+
+        <attr name="dd_layout_scrollFlags" format="integer"/>
+        <attr name="dd_layout_scrollInterpolator" format="reference"/>
+    </declare-styleable>
+
     <declare-styleable name="DdHeaderLayout">
         <!--ready状态滑动偏移量,normal状态下计算完成的距离需要加上这个偏移-->
         <attr name="dd_ready_offset" format="dimension" />
