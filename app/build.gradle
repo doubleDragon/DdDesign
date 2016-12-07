@@ -36,7 +36,7 @@ dependencies {
 //ratingBar
     compile 'com.github.ornolfr:rating-view:0.1.1@aar'
     compile 'com.github.lvmaomao:FlowLayout:0.0.2'
-    compile 'com.github.lvmaomao:widget:0.0.3'
+    compile 'com.github.lvmaomao:widget:0.2.4'
 
     compile project(':library')
 }
