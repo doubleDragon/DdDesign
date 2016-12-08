@@ -709,8 +709,9 @@ public class DdHomeLayout extends LinearLayout{
                 // upto our 'collapsed' offset
                 if (velocityY < 0) {
                     // We're scrolling down
-                    final int targetScroll = -child.getTotalScrollRange()
-                            + child.getDownNestedPreScrollRange();
+//                    final int targetScroll = -child.getTotalScrollRange()
+//                            + child.getDownNestedPreScrollRange();
+                    final int targetScroll = 0;
                     if (getTopBottomOffsetForScrollingSibling() < targetScroll) {
                         // If we're currently not expanded more than the target scroll, we'll
                         // animate a fling
